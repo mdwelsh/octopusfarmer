@@ -4,13 +4,12 @@
  * the game using the space bar, and quit with the q key.
  */
 
-import React from 'react';
-import { Box, Spacer, Text, useInput } from 'ink';
-import { useEffect, useState } from "react";
-import { useStdout } from "ink";
+import { Box, Spacer, Text, useInput, useStdout } from 'ink';
+import React, { useEffect, useState } from 'react';
 
-import { Fish, World, WorldObject } from "./world.js";
 import { Octopus } from "./octopus.js";
+import { Predator } from './predator.js';
+import { Fish, World } from "./world.js";
 
 const UPDATE_INTERVAL = 100;
 
@@ -34,7 +33,24 @@ export function useStdoutDimensions(): [number, number] {
 }
 
 /** Title bar. */
-function Title({ width, moves, score, reach, power, tentacles }: { width: number, moves: number, score: number, reach: number, power: number, tentacles: number }) {
+function Title({ width, moves, score, player }: { width: number, moves: number, score: number, player: Predator }) {
+	if (player instanceof Octopus) {
+		return <OctopusTitle width={width} moves={moves} score={score} player={player} />;
+	} else {
+		return (
+			<Box borderStyle="round" borderColor="green" paddingLeft={1} height={3} width={width} >
+				<Text>🐙 {player.constructor.name} Farmer!</Text>
+				<Spacer />
+				<Text>Moves: {moves}</Text>
+				<Spacer />
+				<Text>Score: {score}</Text>
+			</Box>
+		);
+	}
+}
+
+/** Title bar for an Octopus. */
+function OctopusTitle({ width, moves, score, player }: { width: number, moves: number, score: number, player: Octopus }) {
 	return (
 		<Box borderStyle="round" borderColor="green" paddingLeft={1} height={3} width={width} >
 			<Text>🐙 Octopus Farmer!</Text>
@@ -43,23 +59,23 @@ function Title({ width, moves, score, reach, power, tentacles }: { width: number
 			<Spacer />
 			<Text>Score: {score}</Text>
 			<Spacer />
-			<Text>Reach: {reach}</Text>
+			<Text>Reach: {player.reach}</Text>
 			<Spacer />
-			<Text>Attack: {power}</Text>
+			<Text>Attack: {player.attack_power}</Text>
 			<Spacer />
-			<Text>Tentacles: {tentacles}</Text>
+			<Text>Tentacles: {player.tentacles.length}</Text>
 		</Box>
 	);
 }
 
 /** A single row in the game board. */
-function GameBoardRow({ columns, row, world }: { columns: number; row: number, world: WorldObject[] }) {
+function GameBoardRow({ columns, row, world }: { columns: number; row: number, world: World }) {
 
 	const textElems: React.ReactElement[] = [];
 	let x = 0;
 
 	// Get objects on this row, sorted by x.
-	let objs = world.filter((obj) => obj.y === row).sort((a, b) => a.x - b.x);
+	let objs = world.objects().filter((obj) => obj.y === row).sort((a, b) => a.x - b.x);
 	for (let obj of objs) {
 		if (obj.x > x) {
 			// Add empty space.
@@ -67,7 +83,6 @@ function GameBoardRow({ columns, row, world }: { columns: number; row: number, w
 				<Text>{" ".repeat(obj.x - x)}</Text>
 			);
 		}
-		let bgColor = "black";
 		let color = "blue";
 		if (obj instanceof Fish) {
 			const fish = obj as Fish;
@@ -75,7 +90,7 @@ function GameBoardRow({ columns, row, world }: { columns: number; row: number, w
 			if (fish.underAttack()) {
 				color = "red";
 			}
-		} else if (obj instanceof Octopus) {
+		} else if (obj === world.predator) {
 			color = "green";
 		}
 		textElems.push(
@@ -97,7 +112,7 @@ function GameBoardRow({ columns, row, world }: { columns: number; row: number, w
 
 
 /** The Game Board display. */
-function GameBoard({ columns, rows, world }: { columns: number; rows: number, world: WorldObject[] }) {
+function GameBoard({ columns, rows, world }: { columns: number; rows: number, world: World }) {
 	return (
 		<Box borderStyle="round" borderColor="green" flexDirection="column" width={columns} height={rows}>
 			{
@@ -125,11 +140,6 @@ export default function Game({steps}: {steps: number}) {
 	const [columns, rows] = useStdoutDimensions();
 	const [world, setWorld] = useState(new World(columns - 10, rows - 10));
 	const [moves, setMoves] = useState(0);
-	const [score, setScore] = useState(0);
-	const [reach, setReach] = useState(0);
-	const [power, setPower] = useState(0);
-	const [tentacles, setTentacles] = useState(0);
-	const [worldObjects, setWorldObjects] = useState([] as WorldObject[]);
 
 	useInput((input, key) => {
 		if (input === " ") {
@@ -139,16 +149,16 @@ export default function Game({steps}: {steps: number}) {
 			process.exit();
 		}
 		if (key.leftArrow || input === "h" || input === "a") {
-			world.octopus.moveLeft();
+			world.predator.moveLeft();
 		}
 		if (key.rightArrow || input === "l" || input === "d") {
-			world.octopus.moveRight();
+			world.predator.moveRight();
 		}
 		if (key.upArrow || input === "k" || input === "w") {
-			world.octopus.moveUp();
+			world.predator.moveUp();
 		}
 		if (key.downArrow || input === "j" || input === "s") {
-			world.octopus.moveDown();
+			world.predator.moveDown();
 		}
 	});
 
@@ -158,12 +168,7 @@ export default function Game({steps}: {steps: number}) {
 				return;
 			}
 			world.update();
-			setMoves(world.moves);
-			setScore(world.score);
-			setReach(world.octopus.reach);
-			setPower(world.octopus.attack_power);
-			setTentacles(world.octopus.num_tentacles);
-			setWorldObjects(world.objects());
+			setMoves(world.moves); // Update state to force a re-render.
 			if (world.moves >= steps) {
 				process.exit();
 			}
@@ -175,8 +180,8 @@ export default function Game({steps}: {steps: number}) {
 
 	return (
 		<Box flexDirection="column" height={rows}>
-			<Title width={columns-10} moves={moves} score={score} reach={reach} power={power} tentacles={tentacles} />
-			<GameBoard columns={columns - 10} rows={rows - 7} world={worldObjects} />
+			<Title width={columns - 10} moves={world.moves} score={world.score} player={world.predator} />
+			<GameBoard columns={columns - 10} rows={rows - 7} world={world} />
 			<StatusBar paused={paused} />
 		</Box>
 	);

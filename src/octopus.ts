@@ -3,11 +3,21 @@
  * implement.
  */
 
-import { Fish, World, WorldObject } from "./world.js";
+import { Predator } from "./predator.js";
+import { Fish, World } from "./world.js";
+
+/** Initial speed for the Octopus. */
+const INIT_SPEED = 1;
+/** Initial number of tentacles for the Octopus. */
+const INIT_TENTACLES = 4;
+/** Initial length of the Octopus's tentacles. */
+const INIT_REACH = 5;
+/** Initial attack power for the Octopus. */
+const INIT_ATTACK_POWER = 2;
 
 
 /** The base class for Octopuses. You should not modify any code in this class! */
-export class Octopus implements WorldObject {
+export class Octopus implements Predator {
     world: World;
     glyph: string;
     x: number;
@@ -18,15 +28,15 @@ export class Octopus implements WorldObject {
     attack_power: number;
     tentacles: Fish[];
 
-    constructor(world: World, glyph: string, x: number, y: number, speed: number, num_tentacles: number, reach: number, attack_power: number) {
+    constructor(world: World, glyph: string, x: number, y: number) {
         this.glyph = glyph;
         this.world = world;
         this.x = x;
         this.y = y;
-        this.speed = speed;
-        this.num_tentacles = num_tentacles;
-        this.reach = reach;
-        this.attack_power = attack_power;
+        this.speed = INIT_SPEED;
+        this.num_tentacles = INIT_TENTACLES;
+        this.reach = INIT_REACH;
+        this.attack_power = INIT_ATTACK_POWER;
         this.tentacles = [];
     }
 
@@ -80,6 +90,10 @@ export class Octopus implements WorldObject {
         return this.distance(fish.x, fish.y) <= this.reach;
     }
 
+    /** Return whether this octopus is currently attacking the given fish. */
+    isAttacking(fish: Fish): boolean {
+        return this.tentacles.indexOf(fish) != -1;
+    }
 
     /** Update the state of this octopus on each game step. */
     update(): void {
@@ -143,8 +157,8 @@ export class Octopus implements WorldObject {
 /** Your job is to flesh out the implementation of the MyOctopus class, below. */
 export class MyOctopus extends Octopus {
 
-    constructor(world: World, glyph: string, x: number, y: number, speed: number, num_tentacles: number, reach: number, attack_power: number) {
-        super(world, glyph, x, y, speed, num_tentacles, reach, attack_power);
+    constructor(world: World, glyph: string, x: number, y: number) {
+        super(world, glyph, x, y);
     }
 
 
