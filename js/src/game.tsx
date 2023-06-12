@@ -1,12 +1,20 @@
+/**
+ * This module implements a live, terminal based UI to the Octopus Farmer
+ * game. You can control the Octopus manually with the arrow keys, pause
+ * the game using the space bar, and quit with the q key.
+ */
+
 import React from 'react';
 import { Box, Spacer, Text, useInput } from 'ink';
 import { useEffect, useState } from "react";
 import { useStdout } from "ink";
 
-import { Fish, Octopus, OctopusReach, World, WorldObject } from "./world.js";
+import { Fish, World, WorldObject } from "./world.js";
+import { Octopus } from "./octopus.js";
 
-const UPDATE_INTERVAL = 10;
+const UPDATE_INTERVAL = 100;
 
+/** Get the size of the terminal window. */
 export function useStdoutDimensions(): [number, number] {
 	const { stdout } = useStdout();
 	const [dimensions, setDimensions] = useState<[number, number]>([
@@ -25,6 +33,7 @@ export function useStdoutDimensions(): [number, number] {
 	return dimensions;
 }
 
+/** Title bar. */
 function Title({ width, moves, score, reach, power, tentacles }: { width: number, moves: number, score: number, reach: number, power: number, tentacles: number }) {
 	return (
 		<Box borderStyle="round" borderColor="green" paddingLeft={1} height={3} width={width} >
@@ -43,6 +52,7 @@ function Title({ width, moves, score, reach, power, tentacles }: { width: number
 	);
 }
 
+/** A single row in the game board. */
 function GameBoardRow({ columns, row, world }: { columns: number; row: number, world: WorldObject[] }) {
 
 	const textElems: React.ReactElement[] = [];
@@ -67,11 +77,9 @@ function GameBoardRow({ columns, row, world }: { columns: number; row: number, w
 			}
 		} else if (obj instanceof Octopus) {
 			color = "green";
-		} else if (obj instanceof OctopusReach) {
-			bgColor = "red";
 		}
 		textElems.push(
-			<Text bold backgroundColor={bgColor} color={color} dimColor>{obj.render()}</Text>
+			<Text bold color={color}>{obj.render()}</Text>
 		);
 		x = obj.x + 1;
 	}
@@ -88,6 +96,7 @@ function GameBoardRow({ columns, row, world }: { columns: number; row: number, w
 }
 
 
+/** The Game Board display. */
 function GameBoard({ columns, rows, world }: { columns: number; rows: number, world: WorldObject[] }) {
 	return (
 		<Box borderStyle="round" borderColor="green" flexDirection="column" width={columns} height={rows}>
@@ -100,6 +109,7 @@ function GameBoard({ columns, rows, world }: { columns: number; rows: number, wo
 	);
 }
 
+/** The status bar at the bottom of the screen. */
 function StatusBar({ paused }: { paused: boolean }) {
 	return (
 		<Box padding={1} width="100%" height={1} >
@@ -109,7 +119,8 @@ function StatusBar({ paused }: { paused: boolean }) {
 	);
 }
 
-export default function Game() {
+/** The main game UI. */
+export default function Game({steps}: {steps: number}) {
 	const [paused, setPaused] = useState(false);
 	const [columns, rows] = useStdoutDimensions();
 	const [world, setWorld] = useState(new World(columns - 10, rows - 10));
@@ -142,8 +153,6 @@ export default function Game() {
 	});
 
 	useEffect(() => {
-		let world = new World(columns - 10, rows - 10);
-		setWorld(world);
 		const timer = setInterval(() => {
 			if (paused) {
 				return;
@@ -155,6 +164,9 @@ export default function Game() {
 			setPower(world.octopus.attack_power);
 			setTentacles(world.octopus.num_tentacles);
 			setWorldObjects(world.objects());
+			if (world.moves >= steps) {
+				process.exit();
+			}
 		}, UPDATE_INTERVAL);
 		return () => {
 			clearInterval(timer);
