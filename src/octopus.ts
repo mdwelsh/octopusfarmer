@@ -1,6 +1,12 @@
+/**
+ * This module implements the Octopus base class, and the MyOctopus subclass that you are to
+ * implement.
+ */
+
 import { Fish, World, WorldObject } from "./world.js";
 
 
+/** The base class for Octopuses. You should not modify any code in this class! */
 export class Octopus implements WorldObject {
     world: World;
     glyph: string;
@@ -28,37 +34,54 @@ export class Octopus implements WorldObject {
         return this.glyph;
     }
 
+    /** This is what you will implement in MyOctopus. */
     move(): void {
-        // TODO: move octopus
-    }
+        // Do nothing - implement in MyOctopus.
+     }
 
+    /**
+     * Move to the given coordinates, as long as they are within this.speed units away.
+     * Will not move if the given coordinates are more than this.speed units away.
+     */
     moveTo(x: number, y: number): void {
         if (this.distance(x, y) <= this.speed) {
             this.x = Math.max(0, Math.min(this.world.width - 1, x));
             this.y = Math.max(0, Math.min(this.world.width - 1, y));
         }
     }
+
+    /** Move this.speed units to the left. */
     moveLeft(): void {
         this.moveTo(this.x - this.speed, this.y);
     }
+
+    /** Move this.speed units to the right. */
     moveRight(): void {
         this.moveTo(this.x + this.speed, this.y);
     }
+
+    /** Move this.speed units up. */
     moveUp(): void {
         this.moveTo(this.x, this.y - this.speed);
     }
+
+    /** Move this.speed units down. */
     moveDown(): void {
         this.moveTo(this.x, this.y + this.speed);
     }
 
+    /** Return the distance between the octopus and the given coordinates. */
     distance(x: number, y: number): number {
         return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
     }
 
+    /** Return true if the given fish is within this.reach units of this octopus. */
     canReach(fish: Fish): boolean {
         return this.distance(fish.x, fish.y) <= this.reach;
     }
 
+
+    /** Update the state of this octopus on each game step. */
     update(): void {
         // Move ourselves.
         this.move();
@@ -116,15 +139,18 @@ export class Octopus implements WorldObject {
     }
 }
 
+
+/** Your job is to flesh out the implementation of the MyOctopus class, below. */
 export class MyOctopus extends Octopus {
 
     constructor(world: World, glyph: string, x: number, y: number, speed: number, num_tentacles: number, reach: number, attack_power: number) {
         super(world, glyph, x, y, speed, num_tentacles, reach, attack_power);
     }
 
+
+    /** Rewrite this function to move the Octopus in an intelligent way to maximize its score. */
     move(): void {
-        // Your job is to replace this function with one that does a much better job than a naive
-        // random walk.
+        // This is a sample implementation that moves the octopus randomly.
         const r = Math.random();
         if (r < 0.25) {
             this.moveLeft();
