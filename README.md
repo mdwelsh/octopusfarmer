@@ -5,6 +5,8 @@ with its tentacles. Each fish consumed gives you a certain number of points, and
 to maximize the number of points you get within a certain number of time steps, by writing the
 best code you can to optimize the octopus's movement.
 
+![Octopus Farmer](screenshot.png)
+
 ## Installation
 
 ```bash
