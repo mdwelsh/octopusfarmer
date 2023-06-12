@@ -1,11 +1,11 @@
 /**
- * This module implements a basic UI to the Octopus Farmer game 
+ * This module implements a basic UI to the Octopus Farmer game
  * that only shows the current score, moves, and other key variables.
  */
 
-import React from 'react';
-import { Box, Spacer, Text, useInput } from 'ink';
-import { useEffect, useState } from "react";
+import { Box, Spacer, Text } from 'ink';
+import React, { useEffect, useState } from 'react';
+import { Octopus } from './octopus.js';
 
 import { World } from "./world.js";
 
@@ -26,9 +26,10 @@ export default function Farm({ width, height, steps, updateInterval }: { width: 
 			}
 			setMoves(world.moves);
 			setScore(world.score);
-			setReach(world.octopus.reach);
-			setAttack(world.octopus.attack_power);
-			setTentacles(world.octopus.num_tentacles);
+			let octopus = world.predator as Octopus;
+			setReach(octopus.reach);
+			setAttack(octopus.attack_power);
+			setTentacles(octopus.num_tentacles);
 			if (world.moves >= steps) {
 				process.exit();
 			}

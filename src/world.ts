@@ -3,16 +3,7 @@
  * YOU SHOULD NOT MODIFY ANYTHING IN THIS FILE!
  */
 
-import { Octopus, MyOctopus } from "./octopus.js";
-
-/** Initial speed for the Octopus. */
-const INIT_SPEED = 1;
-/** Initial number of tentacles for the Octopus. */
-const INIT_TENTACLES = 4;
-/** Initial length of the Octopus's tentacles. */
-const INIT_REACH = 5;
-/** Initial attack power for the Octopus. */
-const INIT_ATTACK_POWER = 2;
+import { Predator, PredatorFactory } from "./predator.js";
 
 /** Represents an object in the World that might be rendered by the UI. */
 export interface WorldObject {
@@ -45,15 +36,9 @@ export class Fish implements WorldObject {
         this.fright = fright;
     }
 
-    /** Returns true if this Fish is currently held by the Octopus's tentacles. */
+    /** Returns true if this Fish is currently under attack by the predator. */
     underAttack(): boolean {
-        // If this is one of the octopus's tentacles, then we're under attack.
-        for (let tentacle of this.world.octopus.tentacles) {
-            if (tentacle == this) {
-                return true;
-            }
-        }
-        return false;
+        return this.world.predator.isAttacking(this);
     }
 
     render(): string {
@@ -75,19 +60,20 @@ export class Fish implements WorldObject {
             this.x = Math.max(0, Math.min(this.x + mx, this.world.width - 1));
             this.y = Math.max(0, Math.min(this.y + my, this.world.height - 1));
         }
-        // If we are under attack, then move away from the Octopus.
+        // If we are under attack, run away.
         if (this.underAttack() && Math.random() < this.fright) {
-            const octopus = this.world.octopus;
-            if (this.x < octopus.x) {
+            const predatorX = this.world.predator.x;
+            const predatorY = this.world.predator.y;
+            if (this.x < predatorX) {
                 this.x = Math.max(0, this.x - this.speed);
             }
-            if (this.x > octopus.x) {
+            if (this.x > predatorX) {
                 this.x = Math.min(this.world.width - 1, this.x + this.speed);
             }
-            if (this.y < octopus.y) {
+            if (this.y < predatorY) {
                 this.y = Math.max(0, this.y - this.speed);
             }
-            if (this.y > octopus.y) {
+            if (this.y > predatorY) {
                 this.y = Math.min(this.world.height - 1, this.y + this.speed);
             }
         }
@@ -148,7 +134,7 @@ export class World {
     width: number;
     height: number;
     fishGroups: FishGroup[];
-    octopus: Octopus;
+    predator: Predator;
 
     /** The current number of moves that the world has been running. */
     moves: number;
@@ -160,11 +146,11 @@ export class World {
         this.score = 0;
         this.width = width;
         this.height = height;
-        this.octopus = new MyOctopus(this, "0", Math.floor(width / 2), Math.floor(height / 2), INIT_SPEED, INIT_TENTACLES, INIT_REACH, INIT_ATTACK_POWER);
+        this.predator = PredatorFactory.create(this, Math.floor(width / 2), Math.floor(height / 2));
         this.fishGroups = [];
         this.fishGroups.push(new FishGroup(this, "*", 5, 5, 5, 5, 10, 1, 0.0, 50));
-        this.fishGroups.push(new FishGroup(this, "<", Math.floor(width / 2) + 5, Math.floor(height / 2) - 5, 3, 5, 10, 2, 0.1, 50));
-        this.fishGroups.push(new FishGroup(this, ">", width - 20, height - 30, 4, 10, 10, 3, 0.2, 50));
+        this.fishGroups.push(new FishGroup(this, "$", Math.floor(width / 2) + 5, Math.floor(height / 2) - 5, 3, 5, 10, 2, 0.1, 50));
+        this.fishGroups.push(new FishGroup(this, "#", width - 20, height - 30, 4, 10, 10, 3, 0.2, 50));
     }
 
     /** Update the state of the world. */
@@ -173,7 +159,7 @@ export class World {
         for (let fishGroup of this.fishGroups) {
             fishGroup.update();
         }
-        this.octopus.update();
+        this.predator.update();
     }
 
     /** Returns all Fish in the world. */
@@ -189,7 +175,7 @@ export class World {
     objects(): WorldObject[] {
         let objects: WorldObject[] = [];
         objects = objects.concat(this.fishes());
-        objects = objects.concat(this.octopus);
+        objects = objects.concat(this.predator);
         return objects;
     }
 }
