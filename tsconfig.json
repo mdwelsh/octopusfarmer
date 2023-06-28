@@ -7,6 +7,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "types": ["jest", "node"],
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node16",
@@ -26,3 +27,4 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules", ".next/types/**/*.ts"]
 }
+
