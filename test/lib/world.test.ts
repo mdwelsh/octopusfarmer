@@ -1,5 +1,5 @@
 
-import { World } from '@/src/lib/world';
+import { World } from '@/lib/world';
 
 test("World creation works", () => {
   const world = new World(undefined, 10, 10);

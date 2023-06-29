@@ -1,7 +1,9 @@
-import { Octopus } from "@/lib/octopus.js";
+import { nanoid } from "nanoid";
+import _ from "lodash";
+import { Octopus } from "@/lib/octopus";
 
 /** Initial speed for the Octopus. */
-const INIT_SPEED = 1;
+const INIT_SPEED = 5;
 /** Initial number of tentacles for the Octopus. */
 const INIT_TENTACLES = 4;
 /** Initial length of the Octopus's tentacles. */
@@ -67,17 +69,18 @@ export class Fish {
 	y: number;
 	health: number;
 
-	constructor(world: World, group: FishGroup, x: number, y: number) {
-		this.id = Fish.newId();
+	constructor(world: World, group: FishGroup, x: number, y: number, id?: string) {
+		this.id = id ?? Fish.newId();
 		this.world = world;
 		this.group = group;
 		this.x = x;
 		this.y = y;
 		this.health = group.health;
+		this.world.allFish.set(this.id, this);
 	}
 
 	static newId(): string {
-		return Math.random().toString(36).substring(2, 15);
+        return nanoid();
 	}
 
 	/** Returns true if this Fish is currently held by the Octopus's tentacles. */
@@ -130,6 +133,15 @@ export class Fish {
 			}
 		}
 	}
+
+    toFishData(): FishData {
+        return {
+            id: this.id,
+            x: this.x,
+            y: this.y,
+            health: this.health,
+        };
+    }
 }
 
 /** Represents a group of Fish with the same basic properties, clustered around a center point. */
@@ -173,10 +185,9 @@ export class FishGroup {
 		this.speed = data?.speed ?? speed!;
 		this.fright = data?.fright ?? fright!;
 		this.spawnRate = data?.spawnRate ?? spawnRate!;
-		this.lastSpawn = 0;
+		this.lastSpawn = data?.lastSpawn ?? 0;
 
-		this.fishes = [];
-		for (let i = 0; i < this.numFishes; i++) {
+		this.fishes = data?.fishes?.map((f) => new Fish(world, this, f.x, f.y, f.id)) ?? _.range(this.numFishes).map(() => {
 			const x = Math.max(
 				0,
 				Math.min(
@@ -191,8 +202,8 @@ export class FishGroup {
 					world.height - 1
 				)
 			);
-			this.fishes.push(new Fish(this.world, this, x, y));
-		}
+			return new Fish(this.world, this, x, y);
+		});
 	}
 
 	/** Update all of the Fish in this FishGroup, and spawn new Fish if needed. */
@@ -222,6 +233,24 @@ export class FishGroup {
 			this.lastSpawn = this.world.moves;
 		}
 	}
+
+    toFishGroupData(): FishGroupData {
+        return {
+            glyph: this.glyph,
+            center_x: this.center_x,
+            center_y: this.center_y,
+            radius: this.radius,
+            numFishes: this.numFishes,
+            health: this.health,
+            value: this.value,
+            speed: this.speed,
+            fright: this.fright,
+            spawnRate: this.spawnRate,
+            lastSpawn: this.lastSpawn,
+			fishes: this.fishes.map((fish) => fish.toFishData()),
+        };
+    }
+
 }
 
 /** Represents the game world. */
@@ -289,6 +318,11 @@ export class World {
 			  );
 	}
 
+    /** Move the octopus to the given position. */
+    moveOctopus(x: number, y: number): void {
+        this.octopus.moveTo(x, y);
+    }
+
 	/** Update the state of the world. */
 	update(): void {
 		this.moves++;
@@ -308,16 +342,27 @@ export class World {
 	}
 
 	/** Return the fish with the given ID. */
-	fishById(id: string): Fish | null {
-		return this.allFish.get(id) ?? null;
+	fishById(id: string): Fish {
+		const fish = this.allFish.get(id);
+		if (!fish) {
+			throw new Error(`No fish with ID ${id}`);
+		}
+		return fish;
 	}
 
-	toJson(): string {
-		return JSON.stringify(this);
+    toWorldData(): WorldData {
+        return {
+            width: this.width,
+            height: this.height,
+            moves: this.moves,
+            score: this.score,
+            fishGroups: this.fishGroups.map((fg) => fg.toFishGroupData()),
+            octopus: this.octopus.toOctopusData(),
+        };
+    }
+
+	toJSON(): string {
+		return JSON.stringify(this.toWorldData());
 	}
 
-	static fromJSON(d: Object): World {
-		const wd: WorldData = d as WorldData;
-		return Object.assign(new World(wd));
-	}
 }

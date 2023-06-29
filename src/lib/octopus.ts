@@ -1,4 +1,5 @@
-import { Fish, World, OctopusData } from "@/lib/world.js";
+import { Fish, World, OctopusData } from "@/lib/world";
+import { TentacleData } from "./world.js";
 
 export class Octopus {
 	world: World;
@@ -26,8 +27,8 @@ export class Octopus {
 			this.speed = data.speed;
 			this.reach = data.reach;
 			this.attack = data.attack;
-			this.tentacles = data.tentacles.map((tentacleData) =>
-				tentacleData.fishId ? world.fishById(tentacleData.fishId) : null
+			this.tentacles = data.tentacles.map((tentacleData?: TentacleData) =>
+				tentacleData ? world.fishById(tentacleData.fishId) : null
 			);
 		} else {
 			this.x = x!;
@@ -36,39 +37,33 @@ export class Octopus {
 			this.tentacles = Array(num_tentacles!).fill(null);
 			this.reach = reach!;
 			this.attack = attack!;
-			this.tentacles = [];
 		}
+	}
+
+	toOctopusData(): OctopusData {
+		return {
+			x: this.x,
+			y: this.y,
+			speed: this.speed,
+			reach: this.reach,
+			attack: this.attack,
+			tentacles: this.tentacles.map((tentacle) => {
+				return tentacle ? { fishId: tentacle.id } : null;
+			}),
+		};
 	}
 
 	/**
 	 * Move to the given coordinates, as long as they are within this.speed units away.
-	 * Will not move if the given coordinates are more than this.speed units away.
+	 * Raises an error otherwise.
 	 */
 	moveTo(x: number, y: number): void {
 		if (this.distance(x, y) <= this.speed) {
 			this.x = Math.max(0, Math.min(this.world.width - 1, x));
 			this.y = Math.max(0, Math.min(this.world.width - 1, y));
-		}
-	}
-
-	/** Move this.speed units to the left. */
-	moveLeft(): void {
-		this.moveTo(this.x - this.speed, this.y);
-	}
-
-	/** Move this.speed units to the right. */
-	moveRight(): void {
-		this.moveTo(this.x + this.speed, this.y);
-	}
-
-	/** Move this.speed units up. */
-	moveUp(): void {
-		this.moveTo(this.x, this.y - this.speed);
-	}
-
-	/** Move this.speed units down. */
-	moveDown(): void {
-		this.moveTo(this.x, this.y + this.speed);
+		} else {
+            throw new Error(`Cannot move to coordinates that are more than ${this.speed} units away`);
+        }
 	}
 
 	/** Return the distance between the octopus and the given coordinates. */
@@ -90,7 +85,7 @@ export class Octopus {
 				tentacle.health = tentacle.group.health;
 				const index = this.tentacles.indexOf(tentacle);
 				if (index != -1) {
-					this.tentacles.splice(index, 1);
+                    this.tentacles[index] = null;
 				}
 			}
 		}
@@ -129,6 +124,7 @@ export class Octopus {
 				if (tentacle.health <= 0) {
 					// We killed a fish. It will be removed from the world on the next update.
 					this.world.score += tentacle.group.value;
+                    // XXX MDW: Set tentacle to null
 				}
 			}
 		}
