@@ -15,7 +15,6 @@ function OctopusFarmer() {
 				throw err;
 			});
 			const data = await res.json();
-			console.log("MDW: data is ", data);
 			setGames(data);
 		}
 		fetchGames();
@@ -23,10 +22,9 @@ function OctopusFarmer() {
 
 	return (
 		<div style={{ width: "600px" }}>
-			OctopusFarmer
 			{games.map((game, i) => (
 				<div key={i}>
-					<div>{game}</div>
+					<div>{game.userId} / {game.gameId}</div>
 				</div>
 			))}
 		</div>

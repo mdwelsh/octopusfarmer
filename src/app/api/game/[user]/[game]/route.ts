@@ -14,9 +14,21 @@ export async function GET(
 		`user:${params.user}:game:${params.game}`,
 		"$"
 	);
-	return new Response(JSON.stringify(gameData[0]), {
+	return new Response(JSON.stringify(gameData ? gameData[0] : {}), {
 		headers: { "content-type": "application/json" },
 		status: gameData ? 200 : 404,
+	});
+}
+
+/** Delete a game. */
+export async function DELETE(
+	req: Request,
+	{ params }: RouteSegment
+): Promise<Response> {
+	await kv.delete(`user:${params.user}:game:${params.game}`);
+	return new Response("{}", {
+		headers: { "content-type": "application/json" },
+		status: 204,
 	});
 }
 
@@ -65,6 +77,6 @@ export async function POST(
 		});
 	} catch (e: any) {
 		console.log(e);
-		return new Response(JSON.stringify({error: e.message}), { status: 500 });
+		return new Response(JSON.stringify({ error: e.message }), { status: 500 });
 	}
 }
