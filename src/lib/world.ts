@@ -9,7 +9,7 @@ const INIT_TENTACLES = 4;
 /** Initial length of the Octopus's tentacles. */
 const INIT_REACH = 5;
 /** Initial attack power for the Octopus. */
-const INIT_ATTACK_POWER = 2;
+const INIT_ATTACK_POWER = 25;
 
 /** This is the external Redis representation of the World. */
 export interface WorldData {
@@ -69,13 +69,13 @@ export class Fish {
 	y: number;
 	health: number;
 
-	constructor(world: World, group: FishGroup, x: number, y: number, id?: string) {
+	constructor(world: World, group: FishGroup, x: number, y: number, id?: string, health?: number) {
 		this.id = id ?? Fish.newId();
 		this.world = world;
 		this.group = group;
 		this.x = x;
 		this.y = y;
-		this.health = group.health;
+		this.health = health ?? group.health;
 		this.world.allFish.set(this.id, this);
 	}
 
@@ -104,7 +104,6 @@ export class Fish {
 			return;
 		}
 		if (Math.random() < 0.25) {
-			// Move no more than this.speed units.
 			let mx = Math.floor(Math.random() * this.group.speed);
 			if (Math.random() < 0.5) {
 				mx = -mx;
@@ -187,7 +186,7 @@ export class FishGroup {
 		this.spawnRate = data?.spawnRate ?? spawnRate!;
 		this.lastSpawn = data?.lastSpawn ?? 0;
 
-		this.fishes = data?.fishes?.map((f) => new Fish(world, this, f.x, f.y, f.id)) ?? _.range(this.numFishes).map(() => {
+		this.fishes = data?.fishes?.map((f) => new Fish(world, this, f.x, f.y, f.id, f.health)) ?? _.range(this.numFishes).map(() => {
 			const x = Math.max(
 				0,
 				Math.min(

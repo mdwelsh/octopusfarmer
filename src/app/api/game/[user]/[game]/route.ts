@@ -32,51 +32,77 @@ export async function DELETE(
 	});
 }
 
-/** Update the state of the given game. */
+function sleep(ms: number) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
+
+/** Move octopus and update game state. */
 export async function POST(
 	req: Request,
 	{ params }: RouteSegment
 ): Promise<Response> {
 	try {
+		// Normally I would like to use the Redis transaction commands, but they don't
+		// seem to be supported in Vercel KV (or rather, the underlying upstash/redis
+		// package it is based on).
+
 		// First check if the game is valid.
 		const gameData = await kv.json.get(
 			`user:${params.user}:game:${params.game}`,
 			"$"
 		);
 		if (!gameData) {
-			return new Response("Game not found", { status: 404 });
+			throw new Error("Game not found");
 		}
 		// Parse the request body.
 		const body = await req.json();
-		// We expect only an array [x, y] of coordinates.
-		if (!Array.isArray(body) || body.length !== 2) {
-			return new Response("Invalid request body", { status: 400 });
+		// We expect the body to be a JSON object with "moves" and "octopus" keys.
+		if (!body || typeof body !== "object") {
+			throw new Error("Invalid request body: expecting object");
 		}
+		const moves = body.moves;
+		const octopus = body.octopus;
+		if (typeof moves !== "number" || typeof octopus !== "object") {
+			throw new Error("Invalid request body: expecting moves and octopus keys");
+		}
+		console.log(`MDW: Processing: body ${moves}, game ${gameData[0].world.moves}`);
+
+		// XXX MDW HACKING
+		await sleep(250);
+
 		// Create world from the gameData.
 		const worldData: WorldData = gameData[0].world;
 		if (!worldData) {
-			return new Response("Game not found", { status: 404 });
+			throw new Error("Unable to parse game data");
 		}
 		const world = new World(worldData);
-		// Update the game state.
-		world.moveOctopus(body[0], body[1]);
-		world.update();
-		// Write it back.
-		const newWorldData = world.toWorldData();
-		const newGameData = {
-			gameId: params.game,
-			world: newWorldData,
-		};
-		await kv.json.set(
-			`user:${params.user}:game:${params.game}`,
-			"$",
-			newGameData
-		);
-		return new Response(JSON.stringify(newGameData), {
-			headers: { "content-type": "application/json" },
-		});
+
+		if (moves == world.moves) {
+			// Update the game state.
+			world.moveOctopus(body.octopus.x, body.octopus.y);
+			world.update();
+			// Write it back.
+			const newWorldData = world.toWorldData();
+			const newGameData = {
+				gameId: params.game,
+				world: newWorldData,
+			};
+			await kv.json.set(
+				`user:${params.user}:game:${params.game}`,
+				"$",
+				newGameData
+			);
+			return new Response(JSON.stringify(newGameData), {
+				headers: { "content-type": "application/json" },
+			});
+		} else {
+			console.log(`Dropping concurrent update for moves=${moves} world.moves=${world.moves}`);
+			throw new Error(`Ignoring concurrent update for moves=${moves} world.moves=${world.moves}`);
+		}
 	} catch (e: any) {
 		console.log(e);
-		return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+		return new Response(JSON.stringify({ error: e.message }), { status: 400 });
 	}
 }

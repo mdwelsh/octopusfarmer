@@ -124,7 +124,11 @@ export class Octopus {
 				if (tentacle.health <= 0) {
 					// We killed a fish. It will be removed from the world on the next update.
 					this.world.score += tentacle.group.value;
-                    // XXX MDW: Set tentacle to null
+					// Remove this fish from our tentacles.
+					const index = this.tentacles.indexOf(tentacle);
+					if (index != -1) {
+						this.tentacles[index] = null;
+					}
 				}
 			}
 		}

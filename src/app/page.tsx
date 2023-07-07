@@ -3,8 +3,13 @@
 "use client";
 import styles from "./page.module.css";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Trash } from "@phosphor-icons/react";
+import DeleteGameDialog from "@/components/deletegame";
+import { Button } from "@/components/ui/button";
 
-function OctopusFarmer() {
+
+function GameList() {
 	const [games, setGames] = useState([]);
 
 	useEffect(() => {
@@ -21,10 +26,18 @@ function OctopusFarmer() {
 	}, []);
 
 	return (
-		<div style={{ width: "600px" }}>
+		<div className="flex flex-col w-full gap-2">
 			{games.map((game, i) => (
-				<div key={i}>
-					<div>{game.userId} / {game.gameId}</div>
+				<div className="flex flex-row justify-center gap-4" key={i}>
+					<Link className="flex flex-row" href={`/game/${game.userId}/${game.gameId}`}>
+						<div>{game.userId}</div>
+						<div>{game.gameId}</div>
+					</Link>
+					<div>
+						<DeleteGameDialog className="bg-slate-500" userId={game.userId} gameId={game.gameId} >
+							<Trash size={16} className="text-red-500" />
+						</DeleteGameDialog>
+					</div>
 				</div>
 			))}
 		</div>
@@ -32,14 +45,24 @@ function OctopusFarmer() {
 }
 
 export default function Home() {
+	const newGame = async () => {
+		const res = await fetch("/api/games/testuser", {
+			method: "POST",
+		}).catch((err) => {
+			throw err;
+		});
+		const data = await res.json();
+		window.location.href = `/game/testuser/${data.gameId}`;
+	};
+
+
+
 	return (
-		<main className={styles.main}>
-			<div>
-				<h2>OctopusFarmer</h2>
-			</div>
-			<div>
-				<OctopusFarmer />
-			</div>
-		</main>
+		<div className="flex flex-col font-mono p-8">
+			<Button className="rounded-full border-2 border-red-700 bg-black text-white hover:bg-slate-600" onClick={newGame}>
+				New game
+			</Button>
+			<GameList />
+		</div>
 	);
 }

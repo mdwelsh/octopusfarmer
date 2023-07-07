@@ -5,13 +5,13 @@ import { TentacleData } from "@/lib/world.js";
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;
-const SHOW_GRID = true;
+const SHOW_GRID = false;
 
 function drawWorld(ctx: CanvasRenderingContext2D, world?: WorldData) {
-	console.log("drawWorld called, world.octopus: ", world?.octopus);
     if (!world) {
         return;
     }
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	const tileWidth = CANVAS_WIDTH / world.width;
 	const tileHeight = CANVAS_HEIGHT / world.height;
 	ctx.lineWidth = 1;
@@ -67,7 +67,6 @@ export function WorldView({ world }: { world: WorldData }) {
 	const canvasRef = useRef();
 
 	useEffect(() => {
-		console.log("useEffect called, canvasRef.current: ", canvasRef.current);
 		if (canvasRef.current) {
 			const ctx = canvasRef.current.getContext("2d");
 			drawWorld(ctx, world);
@@ -76,15 +75,11 @@ export function WorldView({ world }: { world: WorldData }) {
 
 	return (
 		<div>
-			<div className="grid grid-cols-2">
-				<div className="text-center">Moves: {world?.moves}</div>
-				<div className="text-center">Score: {world?.score}</div>
-			</div>
 			<canvas
 				ref={canvasRef}
 				width={CANVAS_WIDTH}
 				height={CANVAS_HEIGHT}
-				style={{ border: "2px solid #f05050" }}
+				style={{ border: "2px solid #505050" }}
 			/>
 		</div>
 	);
