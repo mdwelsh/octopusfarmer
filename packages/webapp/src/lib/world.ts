@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import _ from "lodash";
-import { Octopus } from "@/lib/octopus";
+import { Octopus } from "@/lib/octopus.ts";
 
 /** Initial speed for the Octopus. */
 const INIT_SPEED = 5;

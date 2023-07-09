@@ -1,5 +1,4 @@
-import { Fish, World, OctopusData } from "@/lib/world";
-import { TentacleData } from "./world.js";
+import { Fish, World, OctopusData, TentacleData } from "@/lib/world";
 
 export class Octopus {
 	world: World;
