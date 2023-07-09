@@ -12,7 +12,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-export default function DeleteGameDialog({ gameId, userId, children }: { gameId: string, userId: string, children: React.ReactNode; }) {
+export default function DeleteGameDialog({ gameId, children }: { gameId: string, children: React.ReactNode; }) {
+
+	const doDelete = async () => {
+		const res = await fetch(`/api/game/${gameId}`, {
+			method: "DELETE",
+		});
+		if (!res.ok) {
+			return;
+		}
+		const data = await res.json();
+	};
+
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>
@@ -20,14 +31,14 @@ export default function DeleteGameDialog({ gameId, userId, children }: { gameId:
       </AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>Delete game {userId} / {gameId} ?</AlertDialogTitle>
+					<AlertDialogTitle>Delete game {gameId} ?</AlertDialogTitle>
 					<AlertDialogDescription>
 						This action cannot be undone. This will permanently delete this game.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction>Continue</AlertDialogAction>
+					<AlertDialogAction onClick={doDelete} >Continue</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>

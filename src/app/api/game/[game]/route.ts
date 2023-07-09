@@ -3,7 +3,7 @@ export const runtime = "edge";
 import { kv } from "@vercel/kv";
 import { World, WorldData } from "@/lib/world";
 
-type RouteSegment = { params: { user: string; game: string } };
+type RouteSegment = { params: { game: string } };
 
 /** Return the current state of the given game. */
 export async function GET(
@@ -11,7 +11,7 @@ export async function GET(
 	{ params }: RouteSegment
 ): Promise<Response> {
 	const gameData = await kv.json.get(
-		`user:${params.user}:game:${params.game}`,
+		`game:${params.game}`,
 		"$"
 	);
 	return new Response(JSON.stringify(gameData ? gameData[0] : {}), {
@@ -25,10 +25,10 @@ export async function DELETE(
 	req: Request,
 	{ params }: RouteSegment
 ): Promise<Response> {
-	await kv.delete(`user:${params.user}:game:${params.game}`);
+	await kv.del(`game:${params.game}`);
 	return new Response("{}", {
 		headers: { "content-type": "application/json" },
-		status: 204,
+		status: 200,
 	});
 }
 
@@ -50,7 +50,7 @@ export async function POST(
 
 		// First check if the game is valid.
 		const gameData = await kv.json.get(
-			`user:${params.user}:game:${params.game}`,
+			`game:${params.game}`,
 			"$"
 		);
 		if (!gameData) {
@@ -68,9 +68,6 @@ export async function POST(
 			throw new Error("Invalid request body: expecting moves and octopus keys");
 		}
 		console.log(`MDW: Processing: body ${moves}, game ${gameData[0].world.moves}`);
-
-		// XXX MDW HACKING
-		await sleep(250);
 
 		// Create world from the gameData.
 		const worldData: WorldData = gameData[0].world;
@@ -90,7 +87,7 @@ export async function POST(
 				world: newWorldData,
 			};
 			await kv.json.set(
-				`user:${params.user}:game:${params.game}`,
+				`game:${params.game}`,
 				"$",
 				newGameData
 			);

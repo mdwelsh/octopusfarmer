@@ -16,25 +16,27 @@ function GameList() {
 		async function fetchGames() {
 			const res = await fetch("/api/games", {
 				method: "GET",
-			}).catch((err) => {
-				throw err;
 			});
+			if (!res.ok) {
+				console.log("Error fetching game list: ", res);
+				setGames([]);
+				return;
+			}
 			const data = await res.json();
 			setGames(data);
 		}
 		fetchGames();
-	}, []);
+	}, [games]);
 
 	return (
-		<div className="flex flex-col w-full gap-2">
+		<div className="flex flex-col w-full gap-2 pt-4">
 			{games.map((game, i) => (
 				<div className="flex flex-row justify-center gap-4" key={i}>
-					<Link className="flex flex-row" href={`/game/${game.userId}/${game.gameId}`}>
-						<div>{game.userId}</div>
+					<Link className="flex flex-row" href={`/game/${game.gameId}`}>
 						<div>{game.gameId}</div>
 					</Link>
 					<div>
-						<DeleteGameDialog className="bg-slate-500" userId={game.userId} gameId={game.gameId} >
+						<DeleteGameDialog className="bg-slate-500" gameId={game.gameId} >
 							<Trash size={16} className="text-red-500" />
 						</DeleteGameDialog>
 					</div>
@@ -46,20 +48,17 @@ function GameList() {
 
 export default function Home() {
 	const newGame = async () => {
-		const res = await fetch("/api/games/testuser", {
+		const res = await fetch("/api/games", {
 			method: "POST",
 		}).catch((err) => {
 			throw err;
 		});
 		const data = await res.json();
-		window.location.href = `/game/testuser/${data.gameId}`;
+		window.location.href = `/game/${data.gameId}`;
 	};
-
-
-
 	return (
 		<div className="flex flex-col font-mono p-8">
-			<Button className="rounded-full border-2 border-red-700 bg-black text-white hover:bg-slate-600" onClick={newGame}>
+			<Button className="rounded-full w-1/5 border-2 border-red-700 bg-black text-white hover:bg-slate-600" onClick={newGame}>
 				New game
 			</Button>
 			<GameList />

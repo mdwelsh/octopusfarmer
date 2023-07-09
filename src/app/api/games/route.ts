@@ -1,8 +1,10 @@
 export const runtime = "edge";
 
+import { nanoid } from "nanoid";
 import { kv } from "@vercel/kv";
+import { World } from "@/lib/world";
 
-type GameMetadata = { userId: string, gameId: string };
+type GameMetadata = { gameId: string };
 
 /** Return the list of all games. */
 export async function GET(req: Request): Promise<Response> {
@@ -10,17 +12,31 @@ export async function GET(req: Request): Promise<Response> {
     let gameIds: GameMetadata[] = [];
     let cursor = 0;
     do {
-        const games = await kv.scan(cursor, { match: `user:*` });
+        const games = await kv.scan(cursor, { match: `game:*` });
         gameIds = gameIds.concat(games[1].map((key: string) => {
             return {
-                userId: key.split(":")[1],
-                gameId: key.split(":")[3],
+                gameId: key.split(":")[1],
             };
         }));
         cursor = games[0];
     } while (cursor !== 0);
 	return new Response(JSON.stringify(gameIds), {
 		headers: { "content-type": "application/json" },
-		status: gameIds.length > 0 ? 200 : 404,
+		status: 200,
+	});
+}
+
+/** Create a new game. */
+export async function POST(req: Request): Promise<Response> {
+	const gameId = nanoid();
+	const world = new World(undefined, 100, 100);
+	const worldData = world.toWorldData();
+	const gameData = {
+		gameId: gameId,
+		world: worldData,
+	};
+	await kv.json.set(`game:${gameId}`, "$", gameData);
+	return new Response(JSON.stringify(gameData), {
+		headers: { "content-type": "application/json" },
 	});
 }
