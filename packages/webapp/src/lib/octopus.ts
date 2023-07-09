@@ -1,4 +1,4 @@
-import { Fish, World, OctopusData, TentacleData } from "@/lib/world";
+import { Fish, World, OctopusData, TentacleData } from '@/lib/world';
 
 export class Octopus {
 	world: World;
@@ -61,8 +61,8 @@ export class Octopus {
 			this.x = Math.max(0, Math.min(this.world.width - 1, x));
 			this.y = Math.max(0, Math.min(this.world.width - 1, y));
 		} else {
-            throw new Error(`Cannot move to coordinates that are more than ${this.speed} units away`);
-        }
+			throw new Error(`Cannot move to coordinates that are more than ${this.speed} units away`);
+		}
 	}
 
 	/** Return the distance between the octopus and the given coordinates. */
@@ -84,7 +84,7 @@ export class Octopus {
 				tentacle.health = tentacle.group.health;
 				const index = this.tentacles.indexOf(tentacle);
 				if (index != -1) {
-                    this.tentacles[index] = null;
+					this.tentacles[index] = null;
 				}
 			}
 		}
@@ -98,9 +98,7 @@ export class Octopus {
 				}
 			}
 		}
-		fishByDistance.sort(
-			(a, b) => this.distance(a.x, a.y) - this.distance(b.x, b.y)
-		);
+		fishByDistance.sort((a, b) => this.distance(a.x, a.y) - this.distance(b.x, b.y));
 
 		// Grab any fish that we don't already have in our tentacles.
 		for (let fish of fishByDistance) {

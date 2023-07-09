@@ -1,23 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import { WorldData } from "@/lib/world";
-import { TentacleData } from "@/lib/world.js";
+import { WorldData } from '@/lib/world';
+import { TentacleData } from '@/lib/world.js';
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;
 const SHOW_GRID = false;
 
 function drawWorld(ctx: CanvasRenderingContext2D, world?: WorldData) {
-    if (!world) {
-        return;
-    }
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	if (!world) {
+		return;
+	}
+	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	const tileWidth = CANVAS_WIDTH / world.width;
 	const tileHeight = CANVAS_HEIGHT / world.height;
 	ctx.lineWidth = 1;
 	// Draw a grid.
 	if (SHOW_GRID) {
-		ctx.strokeStyle = "#000000";
+		ctx.strokeStyle = '#000000';
 		ctx.lineWidth = 1;
 		for (let x = 0; x < world.width; x++) {
 			ctx.beginPath();
@@ -33,32 +33,18 @@ function drawWorld(ctx: CanvasRenderingContext2D, world?: WorldData) {
 		}
 	}
 	// Draw the octopus.
-	ctx.fillStyle = "#5050ff";
-	ctx.fillRect(
-		world.octopus.x * tileWidth,
-		world.octopus.y * tileHeight,
-		tileWidth,
-		tileHeight
-	);
+	ctx.fillStyle = '#5050ff';
+	ctx.fillRect(world.octopus.x * tileWidth, world.octopus.y * tileHeight, tileWidth, tileHeight);
 	// Draw all fish.
 	for (const fishGroup of world.fishGroups) {
 		for (const fish of fishGroup.fishes) {
 			// If the fish is in the octopus.tentacles, draw it red.
-			if (
-				world.octopus.tentacles.some(
-					(tentacle: TentacleData) => tentacle && tentacle.fishId === fish.id
-				)
-			) {
-				ctx.fillStyle = "#ff5050";
+			if (world.octopus.tentacles.some((tentacle: TentacleData) => tentacle && tentacle.fishId === fish.id)) {
+				ctx.fillStyle = '#ff5050';
 			} else {
-				ctx.fillStyle = "#50ff50";
+				ctx.fillStyle = '#50ff50';
 			}
-			ctx.fillRect(
-				fish.x * tileWidth,
-				fish.y * tileHeight,
-				tileWidth,
-				tileHeight
-			);
+			ctx.fillRect(fish.x * tileWidth, fish.y * tileHeight, tileWidth, tileHeight);
 		}
 	}
 }
@@ -68,19 +54,14 @@ export function WorldView({ world }: { world: WorldData }) {
 
 	useEffect(() => {
 		if (canvasRef.current) {
-			const ctx = canvasRef.current.getContext("2d");
+			const ctx = canvasRef.current.getContext('2d');
 			drawWorld(ctx, world);
 		}
 	}, [world]);
 
 	return (
 		<div>
-			<canvas
-				ref={canvasRef}
-				width={CANVAS_WIDTH}
-				height={CANVAS_HEIGHT}
-				style={{ border: "2px solid #505050" }}
-			/>
+			<canvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} style={{ border: '2px solid #505050' }} />
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -9,14 +9,13 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
-export default function DeleteGameDialog({ gameId, children }: { gameId: string, children: React.ReactNode; }) {
-
+export default function DeleteGameDialog({ gameId, children }: { gameId: string; children: React.ReactNode }) {
 	const doDelete = async () => {
 		const res = await fetch(`/api/game/${gameId}`, {
-			method: "DELETE",
+			method: 'DELETE',
 		});
 		if (!res.ok) {
 			return;
@@ -26,9 +25,7 @@ export default function DeleteGameDialog({ gameId, children }: { gameId: string,
 
 	return (
 		<AlertDialog>
-			<AlertDialogTrigger asChild>
-        {children}
-      </AlertDialogTrigger>
+			<AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Delete game {gameId} ?</AlertDialogTitle>
@@ -38,7 +35,7 @@ export default function DeleteGameDialog({ gameId, children }: { gameId: string,
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction onClick={doDelete} >Continue</AlertDialogAction>
+					<AlertDialogAction onClick={doDelete}>Continue</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>

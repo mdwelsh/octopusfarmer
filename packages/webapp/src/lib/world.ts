@@ -1,6 +1,6 @@
-import { nanoid } from "nanoid";
-import _ from "lodash";
-import { Octopus } from "@/lib/octopus.ts";
+import { nanoid } from 'nanoid';
+import _ from 'lodash';
+import { Octopus } from '@/lib/octopus.ts';
 
 /** Initial speed for the Octopus. */
 const INIT_SPEED = 5;
@@ -80,7 +80,7 @@ export class Fish {
 	}
 
 	static newId(): string {
-        return nanoid();
+		return nanoid();
 	}
 
 	/** Returns true if this Fish is currently held by the Octopus's tentacles. */
@@ -133,14 +133,14 @@ export class Fish {
 		}
 	}
 
-    toFishData(): FishData {
-        return {
-            id: this.id,
-            x: this.x,
-            y: this.y,
-            health: this.health,
-        };
-    }
+	toFishData(): FishData {
+		return {
+			id: this.id,
+			x: this.x,
+			y: this.y,
+			health: this.health,
+		};
+	}
 }
 
 /** Represents a group of Fish with the same basic properties, clustered around a center point. */
@@ -186,23 +186,13 @@ export class FishGroup {
 		this.spawnRate = data?.spawnRate ?? spawnRate!;
 		this.lastSpawn = data?.lastSpawn ?? 0;
 
-		this.fishes = data?.fishes?.map((f) => new Fish(world, this, f.x, f.y, f.id, f.health)) ?? _.range(this.numFishes).map(() => {
-			const x = Math.max(
-				0,
-				Math.min(
-					this.center_x + Math.floor(Math.random() * this.radius),
-					world.width - 1
-				)
-			);
-			const y = Math.max(
-				0,
-				Math.min(
-					this.center_y + Math.floor(Math.random() * this.radius),
-					world.height - 1
-				)
-			);
-			return new Fish(this.world, this, x, y);
-		});
+		this.fishes =
+			data?.fishes?.map((f) => new Fish(world, this, f.x, f.y, f.id, f.health)) ??
+			_.range(this.numFishes).map(() => {
+				const x = Math.max(0, Math.min(this.center_x + Math.floor(Math.random() * this.radius), world.width - 1));
+				const y = Math.max(0, Math.min(this.center_y + Math.floor(Math.random() * this.radius), world.height - 1));
+				return new Fish(this.world, this, x, y);
+			});
 	}
 
 	/** Update all of the Fish in this FishGroup, and spawn new Fish if needed. */
@@ -210,46 +200,30 @@ export class FishGroup {
 		for (let fish of this.fishes) {
 			fish.update();
 		}
-		if (
-			this.fishes.length < this.numFishes &&
-			this.world.moves - this.lastSpawn > this.spawnRate
-		) {
-			const x = Math.max(
-				0,
-				Math.min(
-					this.center_x + Math.floor(Math.random() * this.radius),
-					this.world.width - 1
-				)
-			);
-			const y = Math.max(
-				0,
-				Math.min(
-					this.center_y + Math.floor(Math.random() * this.radius),
-					this.world.height - 1
-				)
-			);
+		if (this.fishes.length < this.numFishes && this.world.moves - this.lastSpawn > this.spawnRate) {
+			const x = Math.max(0, Math.min(this.center_x + Math.floor(Math.random() * this.radius), this.world.width - 1));
+			const y = Math.max(0, Math.min(this.center_y + Math.floor(Math.random() * this.radius), this.world.height - 1));
 			this.fishes.push(new Fish(this.world, this, x, y));
 			this.lastSpawn = this.world.moves;
 		}
 	}
 
-    toFishGroupData(): FishGroupData {
-        return {
-            glyph: this.glyph,
-            center_x: this.center_x,
-            center_y: this.center_y,
-            radius: this.radius,
-            numFishes: this.numFishes,
-            health: this.health,
-            value: this.value,
-            speed: this.speed,
-            fright: this.fright,
-            spawnRate: this.spawnRate,
-            lastSpawn: this.lastSpawn,
+	toFishGroupData(): FishGroupData {
+		return {
+			glyph: this.glyph,
+			center_x: this.center_x,
+			center_y: this.center_y,
+			radius: this.radius,
+			numFishes: this.numFishes,
+			health: this.health,
+			value: this.value,
+			speed: this.speed,
+			fright: this.fright,
+			spawnRate: this.spawnRate,
+			lastSpawn: this.lastSpawn,
 			fishes: this.fishes.map((fish) => fish.toFishData()),
-        };
-    }
-
+		};
+	}
 }
 
 /** Represents the game world. */
@@ -272,11 +246,11 @@ export class World {
 		this.fishGroups = data?.fishGroups
 			? data.fishGroups.map((groupData) => new FishGroup(this, groupData))
 			: [
-					new FishGroup(this, undefined, "*", 5, 5, 5, 5, 100, 10, 1, 0.0, 50),
+					new FishGroup(this, undefined, '*', 5, 5, 5, 5, 100, 10, 1, 0.0, 50),
 					new FishGroup(
 						this,
 						undefined,
-						"<",
+						'<',
 						Math.floor(width! / 2) + 5,
 						Math.floor(height! / 2) - 5,
 						3,
@@ -287,20 +261,7 @@ export class World {
 						0.1,
 						50
 					),
-					new FishGroup(
-						this,
-						undefined,
-						">",
-						width! - 20,
-						height! - 30,
-						4,
-						10,
-						175,
-						10,
-						3,
-						0.2,
-						50
-					),
+					new FishGroup(this, undefined, '>', width! - 20, height! - 30, 4, 10, 175, 10, 3, 0.2, 50),
 			  ];
 
 		this.octopus = data?.octopus
@@ -317,10 +278,10 @@ export class World {
 			  );
 	}
 
-    /** Move the octopus to the given position. */
-    moveOctopus(x: number, y: number): void {
-        this.octopus.moveTo(x, y);
-    }
+	/** Move the octopus to the given position. */
+	moveOctopus(x: number, y: number): void {
+		this.octopus.moveTo(x, y);
+	}
 
 	/** Update the state of the world. */
 	update(): void {
@@ -349,19 +310,18 @@ export class World {
 		return fish;
 	}
 
-    toWorldData(): WorldData {
-        return {
-            width: this.width,
-            height: this.height,
-            moves: this.moves,
-            score: this.score,
-            fishGroups: this.fishGroups.map((fg) => fg.toFishGroupData()),
-            octopus: this.octopus.toOctopusData(),
-        };
-    }
+	toWorldData(): WorldData {
+		return {
+			width: this.width,
+			height: this.height,
+			moves: this.moves,
+			score: this.score,
+			fishGroups: this.fishGroups.map((fg) => fg.toFishGroupData()),
+			octopus: this.octopus.toOctopusData(),
+		};
+	}
 
 	toJSON(): string {
 		return JSON.stringify(this.toWorldData());
 	}
-
 }

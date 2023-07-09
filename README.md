@@ -18,11 +18,12 @@ $ node ./dist/octofarm.js
 ```
 
 There are two ways to run the game.
-* `node ./dist/octofarm.js run` will run the game with a live, text-based display showing the
-octopus, fish, and current score. You can control the octopus with the arrow keys.
-* `node ./dist/octofarm.js farm` will run the game in a headless mode, only showing the
-summary statistics. This is much faster and good for testing your octopus logic over a long
-run.
+
+- `node ./dist/octofarm.js run` will run the game with a live, text-based display showing the
+  octopus, fish, and current score. You can control the octopus with the arrow keys.
+- `node ./dist/octofarm.js farm` will run the game in a headless mode, only showing the
+  summary statistics. This is much faster and good for testing your octopus logic over a long
+  run.
 
 ## Your job: Writing the `MyOctopus` class
 
@@ -41,9 +42,9 @@ fish is grabbed by a tentacle, the fish loses `this.attack_power` health. If the
 drops to 0, the fish is eaten and the Octopus gets `fish.value` points added to its score.
 (All of the above logic is automated by the game; you don't have to implement this!)
 
-Note that fish themselves move and some of them tend to move away from the Octopus when 
+Note that fish themselves move and some of them tend to move away from the Octopus when
 grabbed by a tentacle. If a fish moves beyond `this.reach` units, the Octopus will automatically
-drop the fish, *and* the fish will automatically be restored to full health! Given that it
+drop the fish, _and_ the fish will automatically be restored to full health! Given that it
 may take several time units of grabbing onto a fish with a tentacle to kill it, you may
 want to consider having your octopus move closer to fish it has already grabbed, lest it lose
 the points for fish that try to swim away.
@@ -51,25 +52,26 @@ the points for fish that try to swim away.
 ### Moving the Octopus
 
 The Octopus can use the following methods to help it move:
-* `this.x` and `this.y` are the octopus's current coordinates.
-* `this.moveTo(x, y)` will move the octopus to the given coordinates, as long as those coordinates
-are within `this.speed` units of the octopus's current position. (If you attempt to move too far, 
-the octopus will not move at all.)
-* `this.moveLeft()`,  `this.moveRight()`,  `this.moveUp()`, and `this.moveDown()` will move the
-octopus `this.speed` units in the given direction.
-* `this.distance(x, y)` returns the distance between the octopus's current position and the given
-coordinates.
+
+- `this.x` and `this.y` are the octopus's current coordinates.
+- `this.moveTo(x, y)` will move the octopus to the given coordinates, as long as those coordinates
+  are within `this.speed` units of the octopus's current position. (If you attempt to move too far,
+  the octopus will not move at all.)
+- `this.moveLeft()`, `this.moveRight()`, `this.moveUp()`, and `this.moveDown()` will move the
+  octopus `this.speed` units in the given direction.
+- `this.distance(x, y)` returns the distance between the octopus's current position and the given
+  coordinates.
 
 ### Eating fish
 
 The Octopus will want to observe the state of the fish in the world and try to maximize
 its points by moving towards the tastiest fish. You can use the following methods to help:
 
-* `this.world.getFish()` returns an array of all the fish in the world. Each fish is an
-instance of the `Fish` class, as described below.
-* `this.tentacles` is an array containing each of the fish that the octopus is currently
-grabbing with its tentacles. There can be no more than `this.num_tentacles` fish in this array.
-You are not to modify this array -- it is there to help you decide how to move the octopus.
+- `this.world.getFish()` returns an array of all the fish in the world. Each fish is an
+  instance of the `Fish` class, as described below.
+- `this.tentacles` is an array containing each of the fish that the octopus is currently
+  grabbing with its tentacles. There can be no more than `this.num_tentacles` fish in this array.
+  You are not to modify this array -- it is there to help you decide how to move the octopus.
 
 **Note that your job is not to modify the behavior of the Octopus apart from its movement.**
 That is, the Octopus's eating and tentacle-grabbing behavior is fixed and you should not
@@ -80,15 +82,16 @@ to maximize your score.
 
 The `Fish` class represents a fish to eat, and has the following properties. You are not
 to modify any of these properties in your code, but you are free to read them.
-  + `fish.x` and `fish.y` are the fish's current coordinates.
-  + `fish.value` is the number of points the fish is worth, if consumed.
-  + `fish.health` is the fish's current health. If this reaches 0, the fish is eaten and the
+
+- `fish.x` and `fish.y` are the fish's current coordinates.
+- `fish.value` is the number of points the fish is worth, if consumed.
+- `fish.health` is the fish's current health. If this reaches 0, the fish is eaten and the
   octopus gets `fish.value` points added to its score.
-  + `fish.speed` is the fish's speed. Each time step, the fish will move up to `fish.speed`
+- `fish.speed` is the fish's speed. Each time step, the fish will move up to `fish.speed`
   units.
-  + `fish.fright` is the probability that a fish will try to swim away from the octopus on any
-    time step that it is being grabbed by a tentacle. As you might imagine, the tastiest
-    and highest-value fish tend to be the most skittish and will swim away more often!
+- `fish.fright` is the probability that a fish will try to swim away from the octopus on any
+  time step that it is being grabbed by a tentacle. As you might imagine, the tastiest
+  and highest-value fish tend to be the most skittish and will swim away more often!
 
 # Scoring
 
