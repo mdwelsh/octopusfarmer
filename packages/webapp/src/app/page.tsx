@@ -2,6 +2,7 @@
 
 'use client';
 import styles from './page.module.css';
+import { GameData } from '@/lib/World';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Trash } from '@phosphor-icons/react';
@@ -29,13 +30,13 @@ function GameList() {
 
 	return (
 		<div className="flex flex-col w-full gap-2 pt-4">
-			{games.map((game, i) => (
+			{games.map((game: GameData, i: number) => (
 				<div className="flex flex-row justify-center gap-4" key={i}>
 					<Link className="flex flex-row" href={`/game/${game.gameId}`}>
 						<div>{game.gameId}</div>
 					</Link>
 					<div>
-						<DeleteGameDialog className="bg-slate-500" gameId={game.gameId}>
+						<DeleteGameDialog gameId={game.gameId}>
 							<Trash size={16} className="text-red-500" />
 						</DeleteGameDialog>
 					</div>

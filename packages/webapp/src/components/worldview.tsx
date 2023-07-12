@@ -49,11 +49,14 @@ function drawWorld(ctx: CanvasRenderingContext2D, world?: WorldData) {
 }
 
 export function WorldView({ world }: { world: WorldData }) {
-	const canvasRef = useRef();
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	useEffect(() => {
 		if (canvasRef.current) {
 			const ctx = canvasRef.current.getContext('2d');
+			if (!ctx) {
+				return;
+			}
 			drawWorld(ctx, world);
 		}
 	}, [world]);

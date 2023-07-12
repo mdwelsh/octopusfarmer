@@ -9,6 +9,12 @@ const INIT_REACH = 5;
 /** Initial attack power for the Octopus. */
 const INIT_ATTACK_POWER = 25;
 
+/** This is the external Redis representation of a Game. */
+export interface GameData {
+	gameId: string;
+	world: WorldData;
+}
+
 /** This is the external Redis representation of the World. */
 export interface WorldData {
 	width: number;
@@ -254,7 +260,7 @@ export class Octopus {
 			this.reach = data.reach;
 			this.attack = data.attack;
 			this.tentacles = data.tentacles.map((tentacleData?: TentacleData) =>
-				tentacleData ? world.fishById(tentacleData.fishId) : null
+				(tentacleData && tentacleData.fishId) ? world.fishById(tentacleData.fishId) : null
 			);
 		} else {
 			this.x = x!;
@@ -273,8 +279,8 @@ export class Octopus {
 			speed: this.speed,
 			reach: this.reach,
 			attack: this.attack,
-			tentacles: this.tentacles.map((tentacle) => {
-				return tentacle ? { fishId: tentacle.id } : null;
+			tentacles: this.tentacles.map((tentacle: Fish | null) => {
+				return { fishId: tentacle ? tentacle.id : null };
 			}),
 		};
 	}
