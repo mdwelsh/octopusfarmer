@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { WorldData } from '@/lib/world';
-import { TentacleData } from '@/lib/world.js';
+import { WorldData, TentacleData } from '@/lib/World';
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;

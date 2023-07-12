@@ -2,7 +2,7 @@ export const runtime = 'edge';
 
 import { nanoid } from 'nanoid';
 import { kv } from '@vercel/kv';
-import { World } from '@/lib/world';
+import { World } from '@/lib/World';
 
 type GameMetadata = { gameId: string };
 

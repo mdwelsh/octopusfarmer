@@ -11,6 +11,9 @@
 		"lint": "next lint",
 		"test": "jest"
 	},
+	"eslintConfig": {
+		"extends": "next"
+	},
 	"dependencies": {
 		"@phosphor-icons/react": "^2.0.10",
 		"@radix-ui/react-alert-dialog": "^1.0.4",
@@ -23,7 +26,6 @@
 		"clsx": "^1.2.1",
 		"eslint": "8.43.0",
 		"eslint-config-next": "13.4.6",
-		"lodash": "^4.17.21",
 		"lucide-react": "^0.256.0",
 		"nanoid": "^4.0.2",
 		"next": "^13.4.7",

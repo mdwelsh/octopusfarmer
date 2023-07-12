@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
 import { kv } from '@vercel/kv';
-import { World, WorldData } from '@/lib/world';
+import { World, WorldData } from '@/lib/World';
 
 type RouteSegment = { params: { game: string } };
 

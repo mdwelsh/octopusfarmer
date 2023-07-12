@@ -1,6 +1,7 @@
 'use client';
 import styles from '../../../page.module.css';
-import { React, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import React from 'react';
 import { WorldView } from '@/components/worldview';
 import { Button } from '@/components/ui/button';
 import { Play, PlayPause, Pause } from '@phosphor-icons/react';
