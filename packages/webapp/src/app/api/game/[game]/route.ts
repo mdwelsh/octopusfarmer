@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
 import { kv } from '@vercel/kv';
-import { World, WorldData } from '@/lib/World';
+import { GameData, World, WorldData } from '@/lib/World';
 
 type RouteSegment = { params: { game: string } };
 
@@ -23,11 +23,15 @@ export async function DELETE(req: Request, { params }: RouteSegment): Promise<Re
 	});
 }
 
-function sleep(ms: number) {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
-}
+export type OctopusPosition = {
+	x: number;
+	y: number;
+};
+
+export type MoveData = {
+	moves: number;
+	octopus: OctopusPosition;
+};
 
 /** Move octopus and update game state. */
 export async function POST(req: Request, { params }: RouteSegment): Promise<Response> {
@@ -37,12 +41,12 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 		// package it is based on).
 
 		// First check if the game is valid.
-		const gameData = await kv.json.get(`game:${params.game}`, '$');
+		const gameData = await kv.json.get(`game:${params.game}`, '$') as GameData[];
 		if (!gameData) {
 			throw new Error('Game not found');
 		}
 		// Parse the request body.
-		const body = await req.json();
+		const body = await req.json() as MoveData;
 		// We expect the body to be a JSON object with "moves" and "octopus" keys.
 		if (!body || typeof body !== 'object') {
 			throw new Error('Invalid request body: expecting object');
