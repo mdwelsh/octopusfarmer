@@ -41,12 +41,12 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 		// package it is based on).
 
 		// First check if the game is valid.
-		const gameData = await kv.json.get(`game:${params.game}`, '$') as GameData[];
+		const gameData = (await kv.json.get(`game:${params.game}`, '$')) as GameData[];
 		if (!gameData) {
 			throw new Error('Game not found');
 		}
 		// Parse the request body.
-		const body = await req.json() as MoveData;
+		const body = (await req.json()) as MoveData;
 		// We expect the body to be a JSON object with "moves" and "octopus" keys.
 		if (!body || typeof body !== 'object') {
 			throw new Error('Invalid request body: expecting object');

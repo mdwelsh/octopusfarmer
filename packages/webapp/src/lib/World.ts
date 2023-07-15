@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid';
 
 /** Initial speed for the Octopus. */
 const INIT_SPEED = 5;
@@ -260,7 +260,7 @@ export class Octopus {
 			this.reach = data.reach;
 			this.attack = data.attack;
 			this.tentacles = data.tentacles.map((tentacleData?: TentacleData) =>
-				(tentacleData && tentacleData.fishId) ? world.fishById(tentacleData.fishId) : null
+				tentacleData && tentacleData.fishId ? world.fishById(tentacleData.fishId) : null
 			);
 		} else {
 			this.x = x!;

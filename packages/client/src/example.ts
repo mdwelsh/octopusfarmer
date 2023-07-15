@@ -14,7 +14,7 @@ program
 	.name('example')
 	.version('0.0.1')
 	.description('An example client for the Octopus Farmer game.')
-	.option('-u, --url <string>', 'URL of the Octopus Farm server', 'http://localhost:3000')
+	.option('-u, --url <string>', 'URL of the Octopus Farmer server', 'https://octopusfarmer.com')
 	.option('-s, --steps <int>', 'Total number of steps to run', '1000');
 
 program.command('run [gameId]').action(async (gameId?: string) => {

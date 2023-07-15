@@ -10,7 +10,7 @@ export type WorldData = {
 	score: number;
 	octopus: OctopusData;
 	fishGroups: FishGroupData[];
-}
+};
 
 export type OctopusData = {
 	x: number;

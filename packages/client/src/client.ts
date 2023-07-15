@@ -86,7 +86,7 @@ export class Client {
 	}
 
 	async run(octopus: OctopusFunction, steps: number): Promise<GameData> {
-		term("Starting game ").blue(this.gameId)(" - live display: ").green(`${this.url}/game/${this.gameId}\n`);
+		term('Starting game ').blue(this.gameId)(' - live display: ').green(`${this.url}/game/${this.gameId}\n`);
 		const progressBar = term.progressBar({
 			width: 120,
 			title: `Running for ${steps} steps:`,
@@ -96,7 +96,10 @@ export class Client {
 		});
 		for (let i = 0; i < steps; i++) {
 			await this.step(octopus);
-			progressBar.update({ progress: i / steps, title: `Running for ${steps} steps (cur score ${this.game.world.score}):` });
+			progressBar.update({
+				progress: i / steps,
+				title: `Running for ${steps} steps (cur score ${this.game.world.score}):`,
+			});
 		}
 		progressBar.update({ progress: 1.0, title: `Running for ${steps} steps (cur score ${this.game.world.score}):` });
 		term(`\nFinished running, final score: `).yellow(`${this.game.world.score}\n`);

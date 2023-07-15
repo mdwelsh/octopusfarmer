@@ -29,17 +29,17 @@ export default function GameDetail({ params }: RouteSegment) {
 
 	return (
 		game && (
-		<div className="flex flex-row gap-4 justify-start">
-			<div className="w-160 flex flex-col gap-1 p-4 justify-start">
-				<div className="font-mono font-sm">Viewing game:</div>
-				<div className="font-mono font-sm">{params.game}</div>
-				<div className="font-mono font-sm pt-6">Moves: {game!.world.moves}</div>
-				<div className="font-mono font-sm">Score: {game!.world.score}</div>
+			<div className="flex flex-row gap-4 justify-start">
+				<div className="w-160 flex flex-col gap-1 p-4 justify-start">
+					<div className="font-mono font-sm">Viewing game:</div>
+					<div className="font-mono font-sm">{params.game}</div>
+					<div className="font-mono font-sm pt-6">Moves: {game!.world.moves}</div>
+					<div className="font-mono font-sm">Score: {game!.world.score}</div>
+				</div>
+				<div className="flex flex-row gap-4 p-4 justify-center">
+					<WorldView world={game.world} />
+				</div>
 			</div>
-			<div className="flex flex-row gap-4 p-4 justify-center">
-				<WorldView world={game.world} />
-			</div>
-		</div>
 		)
 	);
 }
