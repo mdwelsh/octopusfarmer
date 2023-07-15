@@ -56,7 +56,6 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 		if (typeof moves !== 'number' || typeof octopus !== 'object') {
 			throw new Error('Invalid request body: expecting moves and octopus keys');
 		}
-		console.log(`MDW: Processing: body ${moves}, game ${gameData[0].world.moves}`);
 
 		// Create world from the gameData.
 		const worldData: WorldData = gameData[0].world;

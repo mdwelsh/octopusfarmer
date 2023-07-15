@@ -1,5 +1,8 @@
 import { GameData, MoveData, OctopusPosition, WorldData } from './types.js';
 
+import terminal from 'terminal-kit';
+const { terminal: term } = terminal;
+
 type OctopusFunction = (_game: GameData) => OctopusPosition;
 
 export class Client {
@@ -20,23 +23,24 @@ export class Client {
 			client.game = await client.newGame();
 			client.gameId = client.game.gameId;
 		}
+		console.log(`Created client for game ${client.gameId}`);
 		return client;
 	}
 
-    score(): number {
-        return this.game.world.score;
-    }
+	score(): number {
+		return this.game.world.score;
+	}
 
-    moves(): number {
-        return this.game.world.moves;
-    }
+	moves(): number {
+		return this.game.world.moves;
+	}
 
-    world(): WorldData {
-        return this.game.world;
-    }
+	world(): WorldData {
+		return this.game.world;
+	}
 
 	async newGame(): Promise<GameData> {
-		const res = await fetch('/api/games', {
+		const res = await fetch(`${this.url}/api/games`, {
 			method: 'POST',
 		});
 		if (!res.ok) {
@@ -46,7 +50,7 @@ export class Client {
 	}
 
 	async fetchGame(): Promise<GameData> {
-		const res = await fetch(`/api/game/${this.gameId}`, {
+		const res = await fetch(`${this.url}/api/game/${this.gameId}`, {
 			method: 'GET',
 		});
 		if (!res.ok) {
@@ -60,7 +64,7 @@ export class Client {
 			moves: this.game.world.moves,
 			octopus: { x, y },
 		};
-		const res = await fetch(`/api/game/${this.gameId}`, {
+		const res = await fetch(`${this.url}/api/game/${this.gameId}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -68,21 +72,34 @@ export class Client {
 			body: JSON.stringify(move),
 		});
 		if (!res.ok) {
-			throw new Error(`Unable to move: ${res}`);
+			const errmsg = await res.text();
+			throw new Error(`Unable to move: ${errmsg}`);
 		}
-        this.game = await res.json() as GameData;
-		return this.game;
+		const newGame = (await res.json()) as GameData;
+		this.game = newGame;
+		return newGame;
 	}
 
-    async step(octopus: OctopusFunction): Promise<GameData> {
-        const newPosition = octopus(this.game);
-        return await this.moveTo(newPosition.x, newPosition.y);
-    }
+	async step(octopus: OctopusFunction): Promise<GameData> {
+		const newPosition = octopus(this.game);
+		return await this.moveTo(newPosition.x, newPosition.y);
+	}
 
-    run(octopus: OctopusFunction, steps: number): GameData {
-        for (let i = 0; i < steps; i++) {
-            this.step(octopus);
-        }
-        return this.game;
-    }
+	async run(octopus: OctopusFunction, steps: number): Promise<GameData> {
+		term("Starting game ").blue(this.gameId)(" - live display: ").green(`${this.url}/game/${this.gameId}\n`);
+		const progressBar = term.progressBar({
+			width: 120,
+			title: `Running for ${steps} steps:`,
+			titleSize: 40,
+			eta: true,
+			percent: true,
+		});
+		for (let i = 0; i < steps; i++) {
+			await this.step(octopus);
+			progressBar.update({ progress: i / steps, title: `Running for ${steps} steps (cur score ${this.game.world.score}):` });
+		}
+		progressBar.update({ progress: 1.0, title: `Running for ${steps} steps (cur score ${this.game.world.score}):` });
+		term(`\nFinished running, final score: `).yellow(`${this.game.world.score}\n`);
+		return this.game;
+	}
 }

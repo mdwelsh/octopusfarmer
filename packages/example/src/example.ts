@@ -15,11 +15,11 @@ program
 	.version('0.0.1')
 	.description('An example client for the Octopus Farmer game.')
 	.option('-u, --url <string>', 'URL of the Octopus Farm server', 'http://localhost:3000')
-	.option('-s, --steps <int>', 'Total number of steps to run', '100');
+	.option('-s, --steps <int>', 'Total number of steps to run', '1000');
 
 program.command('run [gameId]').action(async (gameId?: string) => {
 	const client = await Client.Create(program.opts().url, gameId);
-	client.run(dumbOctopus);
+	client.run(dumbOctopus, parseInt(program.opts().steps));
 });
 
 program.command('status <gameId>').action(async (gameId: string) => {
