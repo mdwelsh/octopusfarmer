@@ -1,10 +1,17 @@
-import type { Config } from 'jest';
-
-const config: Config = {
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+	moduleNameMapper: {
+		'^(\\.{1,2}/.*)\\.js$': '$1',
+	},
 	preset: 'ts-jest',
-	testMatch: ['<rootDir>/test/**/*.ts', '<rootDir>/test/**/*.tsx'],
 	testEnvironment: 'node',
-	testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+	transform: {
+		'^.+\\.(mt|t|cj|j)s$': [
+			'ts-jest',
+			{
+				useESM: true,
+			},
+		],
+	},
+	extensionsToTreatAsEsm: ['.ts'],
 };
-
-export default config;

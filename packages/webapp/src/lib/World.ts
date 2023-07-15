@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid'
 
 /** Initial speed for the Octopus. */
 const INIT_SPEED = 5;
