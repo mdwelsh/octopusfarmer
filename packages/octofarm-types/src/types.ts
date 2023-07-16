@@ -77,6 +77,8 @@ export type FishData = {
 	x: number;
 	/** The current y position of the fish. */
 	y: number;
+	/** The point value of this fish. */
+	value: number;
 	/** The current health of the fish. */
 	health: number;
 };

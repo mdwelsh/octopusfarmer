@@ -123,6 +123,7 @@ export class Fish {
 			x: this.x,
 			y: this.y,
 			health: this.health,
+			value: this.group.value,
 		};
 	}
 }
