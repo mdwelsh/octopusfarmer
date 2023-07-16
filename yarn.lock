@@ -2557,6 +2557,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/string-hash@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@types/string-hash@npm:1.1.1"
+  checksum: e7cdba66dc1cfd88033d66a0fd301abd1434f8e3fc22826443073e5c33a26e5c53a26ef4e062d0ebf3f8590f506dec2351c4b952df1d04ba188bc0a48f411f17
+  languageName: node
+  linkType: hard
+
 "@types/terminal-kit@npm:^2.5.1":
   version: 2.5.1
   resolution: "@types/terminal-kit@npm:2.5.1"
@@ -5176,6 +5183,13 @@ __metadata:
   dependencies:
     ms: ^2.0.0
   checksum: 9c7a74a2827f9294c009266c82031030eae811ca87b0da3dceb8d6071b9bde22c9f3daef0469c3c533cc67a97d8a167cd9fc0389350e5f415f61a79b171ded16
+  languageName: node
+  linkType: hard
+
+"humanize@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "humanize@npm:0.0.9"
+  checksum: bf766ce59fb33c761b18253b472ce0c2dd10d42e7fa81ad887fcd597516040d29c787edd935ae2bac57eef6b02133893c20f917e4e4e4f00551f2730113d1df4
   languageName: node
   linkType: hard
 
@@ -7940,6 +7954,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"string-hash@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "string-hash@npm:1.1.3"
+  checksum: 104b8667a5e0dc71bfcd29fee09cb88c6102e27bfb07c55f95535d90587d016731d52299380052e514266f4028a7a5172e0d9ac58e2f8f5001be61dc77c0754d
+  languageName: node
+  linkType: hard
+
 "string-kit@npm:^0.17.6":
   version: 0.17.10
   resolution: "string-kit@npm:0.17.10"
@@ -8826,6 +8847,7 @@ __metadata:
     "@types/node": 20.3.1
     "@types/react": 18.2.12
     "@types/react-dom": 18.2.5
+    "@types/string-hash": ^1.1.1
     "@typescript-eslint/eslint-plugin": ^5.59.9
     "@typescript-eslint/parser": ^5.59.9
     "@vercel/kv": ^0.2.2
@@ -8835,6 +8857,7 @@ __metadata:
     eslint: 8.43.0
     eslint-config-next: 13.4.6
     eslint-config-nth: ^2.0.1
+    humanize: ^0.0.9
     jest: ^29.5.0
     lucide-react: ^0.256.0
     nanoid: ^4.0.2
@@ -8844,6 +8867,7 @@ __metadata:
     postcss-cli: ^10.1.0
     react: 18.2.0
     react-dom: 18.2.0
+    string-hash: ^1.1.3
     tailwind-merge: ^1.13.2
     tailwindcss: ^3.3.2
     tailwindcss-animate: ^1.0.6

@@ -14,6 +14,20 @@ export type GameData = {
 	world: WorldData;
 };
 
+/** Represents the leaderboard metadata about the set of games. */
+export type GameMetadata = {
+	/** The hash of the game ID. */
+	hash: string;
+	/** The date and time this game was created. */
+	created: string;
+	/** The date and time this game was last modified. */
+	modified: string;
+	/** The current number of moves in this game world. */
+	moves: number;
+	/** The current score for this game. */
+	score: number;
+};
+
 /** Represents the world state for a given game. */
 export type WorldData = {
 	/** The width of the world in cells. */

@@ -2,23 +2,15 @@ export const runtime = 'edge';
 
 import { kv } from '@vercel/kv';
 import { World } from '@/lib/World';
-import { GameData, WorldData } from 'octofarm-types';
-import { GameDataInternal, WorldDataInternal } from '@/lib/World';
+import { GameData } from 'octofarm-types';
+import { GameDataInternal } from '@/lib/World';
+import { loadGame, saveGame } from '@/lib/storage';
 
 type RouteSegment = { params: { game: string } };
 
-/** Return the given game. */
-async function getGame(gameId: string): Promise<GameDataInternal> {
-	const gameDataInternal = (await kv.json.get(`game:${gameId}`, '$')) as GameDataInternal[];
-	if (!gameDataInternal) {
-		throw new Error('Game not found');
-	}
-	return gameDataInternal[0];
-}
-
 /** Return the current state of the given game. */
 export async function GET(req: Request, { params }: RouteSegment): Promise<Response> {
-	const gameDataInternal = await getGame(params.game);
+	const gameDataInternal = await loadGame(params.game);
 	const world = new World(gameDataInternal.world);
 	const gameData: GameData = {
 		gameId: params.game,
@@ -71,7 +63,7 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 		}
 
 		// Get the game world state.
-		const gameDataInternal = await getGame(params.game);
+		const gameDataInternal = await loadGame(params.game);
 		const world = new World(gameDataInternal.world);
 
 		if (moves == world.moves) {
@@ -86,7 +78,7 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 				modified: new Date().toISOString(),
 				world: world.toWorldDataInternal(),
 			};
-			await kv.json.set(`game:${params.game}`, '$', newGameDataInternal);
+			await saveGame(newGameDataInternal);
 
 			// Send reply.
 			const newGameData: GameData = {

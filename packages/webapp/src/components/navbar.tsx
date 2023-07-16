@@ -10,6 +10,9 @@ export default function NavBar() {
 					<p className="font-mono">🐙🌾 Octopus Farmer</p>
 				</Link>
 			</div>
+			<div className="font-mono flex flex-row pr-8 underline">
+				<a href="https://github.com/mdwelsh/octopusfarmer">GitHub</a>
+			</div>
 		</div>
 	);
 }

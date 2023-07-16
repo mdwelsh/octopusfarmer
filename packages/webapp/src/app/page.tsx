@@ -2,15 +2,28 @@
 
 'use client';
 import styles from './page.module.css';
-import { GameData } from 'octofarm-types';
+import { GameMetadata } from 'octofarm-types';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Trash } from '@phosphor-icons/react';
-import DeleteGameDialog from '@/components/deletegame';
 import { Button } from '@/components/ui/button';
+// @ts-expect-error
+import { humanize } from 'humanize';
+
+function About() {
+	return (
+		<div className="w-3/5 font-mono text-sm text-slate-400">
+			Octopus Farmer is a game in which you control an octopus that roams around a world, catching fish with its
+			tentacles. The game is played by writing a program that controls the octopus via a REST API. See{' '}
+			<span className="underline">
+				<a href="https://github.com/mdwelsh/octopusfarmer">the GitHub page</a>
+			</span>{' '}
+			for more details and documentation.
+		</div>
+	);
+}
 
 function GameList() {
 	const [games, setGames] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchGames() {
@@ -24,46 +37,37 @@ function GameList() {
 			}
 			const data = await res.json();
 			setGames(data);
+			setLoading(false);
 		}
 		fetchGames();
 	}, [games]);
 
 	return (
 		<div className="flex flex-col w-full gap-2 pt-4">
-			{games.map((game: GameData, i: number) => (
-				<div className="flex flex-row justify-center gap-4" key={i}>
-					<Link className="flex flex-row" href={`/game/${game.gameId}`}>
-						<div>{game.gameId}</div>
-					</Link>
+			{loading ? (
+				<div>Loading...</div>
+			) : (
+				<div>
 					<div>
-						<DeleteGameDialog gameId={game.gameId}>
-							<Trash size={16} className="text-red-500" />
-						</DeleteGameDialog>
+					Leaderboard
 					</div>
+					{games.map((game: GameMetadata, i: number) => (
+						<div className="flex flex-row gap-4 pt-4" key={i}>
+							hash: {game.hash} score: {game.score} moves: {game.moves} created:{' '}
+							{humanize.relativeTime(new Date(game.created).getTime() / 1000)} modified:{' '}
+							{humanize.relativeTime(new Date(game.modified).getTime() / 1000)}
+						</div>
+					))}
 				</div>
-			))}
+			)}
 		</div>
 	);
 }
 
 export default function Home() {
-	const newGame = async () => {
-		const res = await fetch('/api/games', {
-			method: 'POST',
-		}).catch((err) => {
-			throw err;
-		});
-		const data = await res.json();
-		window.location.href = `/game/${data.gameId}`;
-	};
 	return (
 		<div className="flex flex-col font-mono p-8">
-			<Button
-				className="rounded-full w-1/5 border-2 border-red-700 bg-black text-white hover:bg-slate-600"
-				onClick={newGame}
-			>
-				New game
-			</Button>
+			<About />
 			<GameList />
 		</div>
 	);
