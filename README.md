@@ -38,7 +38,7 @@ octopus to catch any fish, so the final score should be 0.
 ## How the game works
 
 The game world consists of a rectangular grid of cells of dimension `width` x `height` .
-The top-left cell is (0, 0) and the bottom-right cell is ( `width` -1, `height` -1).
+The top-left cell is (0, 0) and the bottom-right cell is ( `width-1` , `height-1` ).
 
 There are a number of fish happily swimming around in the world, each with a different
 point value and differing amounts of health. The octopus starts at a random location 
@@ -118,7 +118,10 @@ a JSON body containing the following:
 
 ```
 {
-  "octopus": { "x": <x position to move to>, "y": <y position to move to> },
+  "octopus": {
+    "x": <x position to move to>,
+    "y": <y position to move to>
+  },
   "moves": <current value of world.moves property>
 }
 ```
@@ -146,7 +149,7 @@ The state of the game world is reflected in the `world` object returned by the A
 information about the size of the world, the location of each fish, and the location of the
 octopus.
 
-```json
+```
 {
   "width": <width of the world in cells>,
   "height": <height of the world in cells>,
@@ -173,7 +176,7 @@ There are a number of fish happily swimming around in the world, each with a dif
 point value and differing amounts of health. The fish are represented in the `fish` array
 of the world state object, as so:
 
-```json
+```
 {
   ...
   "fish": [
@@ -193,13 +196,13 @@ The fish move somewhat randomly, but will tend to swim away from the octopus if 
 one of its tentacles. The `health` property of the fish represents the amount of damage
 that the fish can take before dying. When the fish's health drops to zero, the octopus
 eats it, and the fish is removed from the game, and `fish.value` points are added to the
-world's `score`.
+world's `score` .
 
 ### The octopus state object
 
 The octopus is represented in the world state as follows:
 
-```json
+```
 {
   ...
   "octopus": {
@@ -219,14 +222,14 @@ single time step. The `reach` property represents the maximum distance that the 
 tentacles can reach. The `attack` property represents the amount of damage done to a fish
 per time step when grabbed by a tentacle.
 
-Note that the `speed`, `reach`, and `attack` properties will not change during the game.
+Note that the `speed` , `reach` , and `attack` properties will not change during the game.
 (In a future version, we may add the ability to upgrade the octopus's abilities during the
 game, but for now, these values are constant.)
 
 The `tentacles` array has one entry, one for each tentacle. The value of each entry
-is either a `fishId` or `null`. If the value is `null`, then the tentacle is not
-currently grabbing a fish. If it is a `fishId`, then the tentacle is grabbing the fish
-with the ID `fishId`.
+is either a `fishId` or `null` . If the value is `null` , then the tentacle is not
+currently grabbing a fish. If it is a `fishId` , then the tentacle is grabbing the fish
+with the ID `fishId` .
 
 ## A simple implementation
 
@@ -246,12 +249,13 @@ function dumbOctopus(game: GameData): OctopusPosition {
 ```
 
 Here, the `dumbOctopus` function is invoked with the current game state
-(`game: GameData`), and returns an `OctopusPosition` object, which has
+( `game: GameData` ), and returns an `OctopusPosition` object, which has
 the proposed `x` and `y` coordinates for the octopus.
 
 `dumbOctopus` is invoked as a callback on each time step by the
 `Client.run()` function:
   
+
 ```typescript
 const url = "https://octopusfarmer.com";
 const gameId = "< game ID from a POST to /api/games >";
