@@ -12,5 +12,5 @@ export async function loadGame(gameId: string): Promise<GameDataInternal> {
 
 /** Store the given game. */
 export async function saveGame(gameDataInternal: GameDataInternal): Promise<void> {
-    await kv.json.set(`game:${gameDataInternal.gameId}`, '$', gameDataInternal);
+	await kv.json.set(`game:${gameDataInternal.gameId}`, '$', gameDataInternal);
 }

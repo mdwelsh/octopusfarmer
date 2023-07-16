@@ -48,9 +48,7 @@ function GameList() {
 				<div>Loading...</div>
 			) : (
 				<div>
-					<div>
-					Leaderboard
-					</div>
+					<div>Leaderboard</div>
 					{games.map((game: GameMetadata, i: number) => (
 						<div className="flex flex-row gap-4 pt-4" key={i}>
 							hash: {game.hash} score: {game.score} moves: {game.moves} created:{' '}

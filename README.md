@@ -41,7 +41,7 @@ The game world consists of a rectangular grid of cells of dimension `width` x `h
 The top-left cell is (0, 0) and the bottom-right cell is ( `width-1` , `height-1` ).
 
 There are a number of fish happily swimming around in the world, each with a different
-point value and differing amounts of health. The octopus starts at a random location 
+point value and differing amounts of health. The octopus starts at a random location
 near the middle of the game world. As fish are consumed, new fish will occasionally spawn
 in the world to replace them.
 
@@ -76,8 +76,8 @@ The REST API for the Octopus Farmer game is very simple and is described below.
 To create a game, make a POST request to `https://octopusfarmer.com/api/games` with an empty body.
 The response will be a JSON object containing the properties:
 
-* `gameId`: the unique identifier for the game.
-* `world`: the initial state of the game world, as described below.
+- `gameId`: the unique identifier for the game.
+- `world`: the initial state of the game world, as described below.
 
 The `gameId` field is a secret token that represents your game -- keep it
 private! Anyone can use this `gameId` to interact with the game world (by
@@ -104,12 +104,12 @@ game world change in real time.
 
 ### Getting the current state of the game
 
-To get the current state of the game, make a GET request to `https://octopusfarmer.com/api/game/<gameId>` , 
+To get the current state of the game, make a GET request to `https://octopusfarmer.com/api/game/<gameId>` ,
 where `<gameId>` is the unique identifier for the game. The response will be a JSON object containing
 the properties:
 
-* `gameId`: the unique identifier for the game.
-* `world`: the current state of the game world, as described below.
+- `gameId`: the unique identifier for the game.
+- `world`: the current state of the game world, as described below.
 
 ### Moving the Octopus
 
@@ -128,20 +128,20 @@ a JSON body containing the following:
 
 where `<gameId>` is the unique identifier for the game. The `x` and `y` properties of the `octopus` object should be the X and Y coordinates where the octopus should move.
 
-Note that you do not have control over which fish, if any, the octopus will grab with its tentacles; 
+Note that you do not have control over which fish, if any, the octopus will grab with its tentacles;
 all you control is the position of the octopus. Note that the octopus may only move up to a certain
 distance from its current position on each move, according to the `octopus.speed` property in the
 world state. If you attempt to move the octopus too far, the server will return an error.
 
 The `moves` property should contain the most recent value of the `moves` property from the
 world state, as described in further detail below. This is a simple check to ensure that you
-are not making moves based on stale information; if you send a move with a stale `moves` value, 
+are not making moves based on stale information; if you send a move with a stale `moves` value,
 the server will return an error.
 
 Upon a successful move, the server will return a JSON object containing the properties:
 
-* `gameId`: the unique identifier for the game.
-* `world`: the updated state of the game world, as described below.
+- `gameId`: the unique identifier for the game.
+- `world`: the updated state of the game world, as described below.
 
 ## The world state object
 
@@ -255,11 +255,10 @@ the proposed `x` and `y` coordinates for the octopus.
 
 `dumbOctopus` is invoked as a callback on each time step by the
 `Client.run()` function:
-  
 
 ```typescript
-const url = "https://octopusfarmer.com";
-const gameId = "< game ID from a POST to /api/games >";
+const url = 'https://octopusfarmer.com';
+const gameId = '< game ID from a POST to /api/games >';
 const client = await Client.Create(url, gameId);
 client.run(dumbOctopus, 1000);
 ```

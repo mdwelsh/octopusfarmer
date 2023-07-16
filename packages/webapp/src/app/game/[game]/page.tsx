@@ -41,7 +41,7 @@ export default function GameDetail({ params }: RouteSegment) {
 					<div className="pt-6">
 						<DeleteGameDialog gameId={game.gameId}>
 							<Button className="rounded-full border-2 border-red-700 bg-black text-white hover:bg-slate-600">
-							<Trash size={20} className="text-red-500" />
+								<Trash size={20} className="text-red-500" />
 							</Button>
 						</DeleteGameDialog>
 					</div>
