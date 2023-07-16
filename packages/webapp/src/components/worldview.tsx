@@ -35,16 +35,14 @@ function drawWorld(ctx: CanvasRenderingContext2D, world?: WorldData) {
 	ctx.fillStyle = '#5050ff';
 	ctx.fillRect(world.octopus.x * tileWidth, world.octopus.y * tileHeight, tileWidth, tileHeight);
 	// Draw all fish.
-	for (const fishGroup of world.fishGroups) {
-		for (const fish of fishGroup.fishes) {
-			// If the fish is in the octopus.tentacles, draw it red.
-			if (world.octopus.tentacles.some((tentacle: TentacleData) => tentacle && tentacle.fishId === fish.id)) {
-				ctx.fillStyle = '#ff5050';
-			} else {
-				ctx.fillStyle = '#50ff50';
-			}
-			ctx.fillRect(fish.x * tileWidth, fish.y * tileHeight, tileWidth, tileHeight);
+	for (const fish of world.fish) {
+		// If the fish is in the octopus.tentacles, draw it red.
+		if (world.octopus.tentacles.some((tentacle: TentacleData) => tentacle && tentacle.fishId === fish.id)) {
+			ctx.fillStyle = '#ff5050';
+		} else {
+			ctx.fillStyle = '#50ff50';
 		}
+		ctx.fillRect(fish.x * tileWidth, fish.y * tileHeight, tileWidth, tileHeight);
 	}
 }
 

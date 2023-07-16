@@ -2,7 +2,8 @@ export const runtime = 'edge';
 
 import { nanoid } from 'nanoid';
 import { kv } from '@vercel/kv';
-import { World } from '@/lib/World';
+import { World, GameDataInternal } from '@/lib/World';
+import { GameData } from 'octofarm-types';
 
 type GameMetadata = { gameId: string };
 
@@ -32,12 +33,24 @@ export async function GET(req: Request): Promise<Response> {
 export async function POST(req: Request): Promise<Response> {
 	const gameId = nanoid();
 	const world = new World(undefined, 100, 100);
-	const worldData = world.toWorldData();
-	const gameData = {
+	const now = new Date().toISOString();
+
+	// Internal representation.
+	const gameDataInternal: GameDataInternal = {
 		gameId: gameId,
-		world: worldData,
+		created: now,
+		modified: now,
+		world: world.toWorldDataInternal(),
 	};
-	await kv.json.set(`game:${gameId}`, '$', gameData);
+	await kv.json.set(`game:${gameId}`, '$', gameDataInternal);
+
+	// External representation.
+	const gameData: GameData = {
+		gameId: gameId,
+		created: now,
+		modified: now,
+		world: world.toWorldData(),
+	};
 	return new Response(JSON.stringify(gameData), {
 		headers: { 'content-type': 'application/json' },
 	});

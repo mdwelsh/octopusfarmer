@@ -3,15 +3,32 @@ export const runtime = 'edge';
 import { kv } from '@vercel/kv';
 import { World } from '@/lib/World';
 import { GameData, WorldData } from 'octofarm-types';
+import { GameDataInternal, WorldDataInternal } from '@/lib/World';
 
 type RouteSegment = { params: { game: string } };
 
+/** Return the given game. */
+async function getGame(gameId: string): Promise<GameDataInternal> {
+	const gameDataInternal = (await kv.json.get(`game:${gameId}`, '$')) as GameDataInternal[];
+	if (!gameDataInternal) {
+		throw new Error('Game not found');
+	}
+	return gameDataInternal[0];
+}
+
 /** Return the current state of the given game. */
 export async function GET(req: Request, { params }: RouteSegment): Promise<Response> {
-	const gameData = await kv.json.get(`game:${params.game}`, '$');
-	return new Response(JSON.stringify(gameData ? gameData[0] : {}), {
+	const gameDataInternal = await getGame(params.game);
+	const world = new World(gameDataInternal.world);
+	const gameData: GameData = {
+		gameId: params.game,
+		created: gameDataInternal.created,
+		modified: gameDataInternal.modified,
+		world: world.toWorldData(),
+	};
+	return new Response(JSON.stringify(gameData), {
 		headers: { 'content-type': 'application/json' },
-		status: gameData ? 200 : 404,
+		status: 200,
 	});
 }
 
@@ -41,11 +58,6 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 		// seem to be supported in Vercel KV (or rather, the underlying upstash/redis
 		// package it is based on).
 
-		// First check if the game is valid.
-		const gameData = (await kv.json.get(`game:${params.game}`, '$')) as GameData[];
-		if (!gameData) {
-			throw new Error('Game not found');
-		}
 		// Parse the request body.
 		const body = (await req.json()) as MoveData;
 		// We expect the body to be a JSON object with "moves" and "octopus" keys.
@@ -58,24 +70,31 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 			throw new Error('Invalid request body: expecting moves and octopus keys');
 		}
 
-		// Create world from the gameData.
-		const worldData: WorldData = gameData[0].world;
-		if (!worldData) {
-			throw new Error('Unable to parse game data');
-		}
-		const world = new World(worldData);
+		// Get the game world state.
+		const gameDataInternal = await getGame(params.game);
+		const world = new World(gameDataInternal.world);
 
 		if (moves == world.moves) {
 			// Update the game state.
 			world.moveOctopus(body.octopus.x, body.octopus.y);
 			world.update();
+
 			// Write it back.
-			const newWorldData = world.toWorldData();
-			const newGameData = {
+			const newGameDataInternal: GameDataInternal = {
 				gameId: params.game,
-				world: newWorldData,
+				created: gameDataInternal.created,
+				modified: new Date().toISOString(),
+				world: world.toWorldDataInternal(),
 			};
-			await kv.json.set(`game:${params.game}`, '$', newGameData);
+			await kv.json.set(`game:${params.game}`, '$', newGameDataInternal);
+
+			// Send reply.
+			const newGameData: GameData = {
+				gameId: params.game,
+				created: newGameDataInternal.created,
+				modified: newGameDataInternal.modified,
+				world: world.toWorldData(),
+			};
 			return new Response(JSON.stringify(newGameData), {
 				headers: { 'content-type': 'application/json' },
 			});

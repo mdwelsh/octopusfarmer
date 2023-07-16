@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
+import open from 'open';
 import { Client } from './client.js';
 import { GameData, OctopusPosition } from 'octofarm-types';
 
@@ -15,15 +16,22 @@ program
 	.version('0.0.1')
 	.description('An example client for the Octopus Farmer game.')
 	.option('-u, --url <string>', 'URL of the Octopus Farmer server', 'https://octopusfarmer.com')
-	.option('-s, --steps <int>', 'Total number of steps to run', '1000');
+	.option('-s, --steps <int>', 'Total number of steps to run', '1000')
+	.option('-v, --view', 'Open a browser window to view the game');
 
 program.command('run [gameId]').action(async (gameId?: string) => {
 	const client = await Client.Create(program.opts().url, gameId);
+	if (program.opts().view) {
+		open(client.previewUrl());
+	}
 	client.run(dumbOctopus, parseInt(program.opts().steps));
 });
 
 program.command('status <gameId>').action(async (gameId: string) => {
 	const client = await Client.Create(program.opts().url, gameId);
+	if (program.opts().view) {
+		open(client.previewUrl());
+	}
 	const game = await client.fetchGame();
 	console.log(game);
 });

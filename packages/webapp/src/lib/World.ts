@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { WorldData, TentacleData, OctopusData, FishData, FishGroupData } from 'octofarm-types';
+import { WorldData, TentacleData, OctopusData, FishData } from 'octofarm-types';
 
 /** Initial speed for the Octopus. */
 const INIT_SPEED = 5;
@@ -9,6 +9,40 @@ const INIT_TENTACLES = 4;
 const INIT_REACH = 5;
 /** Initial attack power for the Octopus. */
 const INIT_ATTACK_POWER = 25;
+
+/** Internal representation of a group of fish. */
+export type FishGroupData = {
+	fishes: FishData[];
+	glyph: string;
+	center_x: number;
+	center_y: number;
+	radius: number;
+	numFishes: number;
+	health: number;
+	value: number;
+	speed: number;
+	fright: number;
+	spawnRate: number;
+	lastSpawn: number;
+};
+
+/** Internal representation of the world state for a given game. */
+export type WorldDataInternal = {
+	width: number;
+	height: number;
+	moves: number;
+	score: number;
+	octopus: OctopusData;
+	fishGroups: FishGroupData[];
+};
+
+/** Internal representation of a single game state. */
+export type GameDataInternal = {
+	gameId: string;
+	created: string;
+	modified: string;
+	world: WorldDataInternal;
+};
 
 /** A Fish, which the Octopus wants to eat. */
 export class Fish {
@@ -321,7 +355,7 @@ export class World {
 	octopus: Octopus;
 	allFish: Map<string, Fish>;
 
-	constructor(data?: WorldData, width?: number, height?: number) {
+	constructor(data?: WorldDataInternal, width?: number, height?: number) {
 		this.width = data?.width ?? width!;
 		this.height = data?.height ?? height!;
 		this.moves = data?.moves ?? 0;
@@ -396,6 +430,17 @@ export class World {
 	}
 
 	toWorldData(): WorldData {
+		return {
+			width: this.width,
+			height: this.height,
+			moves: this.moves,
+			score: this.score,
+			fish: this.fishes().map((fish) => fish.toFishData()),
+			octopus: this.octopus.toOctopusData(),
+		};
+	}
+
+	toWorldDataInternal(): WorldDataInternal {
 		return {
 			width: this.width,
 			height: this.height,

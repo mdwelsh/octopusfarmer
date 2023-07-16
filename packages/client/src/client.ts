@@ -39,6 +39,10 @@ export class Client {
 		return this.game.world;
 	}
 
+	previewUrl(): string {
+		return `${this.url}/game/${this.gameId}`;
+	}
+
 	async newGame(): Promise<GameData> {
 		const res = await fetch(`${this.url}/api/games`, {
 			method: 'POST',
@@ -86,7 +90,7 @@ export class Client {
 	}
 
 	async run(octopus: OctopusFunction, steps: number): Promise<GameData> {
-		term('Starting game ').blue(this.gameId)(' - live display: ').green(`${this.url}/game/${this.gameId}\n`);
+		term('Starting game ').blue(this.gameId)(' - live display: ').green(`${this.previewUrl()}\n`);
 		const progressBar = term.progressBar({
 			width: 120,
 			title: `Running for ${steps} steps:`,
