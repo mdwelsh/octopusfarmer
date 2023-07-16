@@ -1,7 +1,8 @@
 export const runtime = 'edge';
 
 import { kv } from '@vercel/kv';
-import { GameData, World, WorldData } from '@/lib/World';
+import { World } from '@/lib/World';
+import { GameData, WorldData } from 'octofarm-types';
 
 type RouteSegment = { params: { game: string } };
 

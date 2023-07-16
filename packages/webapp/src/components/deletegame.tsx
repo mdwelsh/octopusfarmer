@@ -10,7 +10,6 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 
 export default function DeleteGameDialog({ gameId, children }: { gameId: string; children: React.ReactNode }) {
 	const doDelete = async () => {

@@ -1,29 +1,95 @@
 # Octopus Farmer 🐙🌱
 
-This is a little text-based game in which you play as an octopus that attempts to catch fish
+This is a web-based game in which you play as an octopus that attempts to catch fish
 with its tentacles. Each fish consumed gives you a certain number of points, and your goal is
 to maximize the number of points you get within a certain number of time steps, by writing the
 best code you can to optimize the octopus's movement.
 
-## Installation
+The game itself is hosted on https://octopusfarmer.com and is accessed through a simple REST
+API, described below. Your job is to write a client program that interacts with this API to
+create a game and control the octopus to maximize your score.
+
+The server code itself can be found in the `packages/webapp` directory of this repo.
+You are not to modify the server in any way.
+
+There is an example client, written in TypeScript, in the `packages/client` directory.
+Your own client code can be in any language you like.
+
+## Quick test
+
+The example client code is incredibly dumb and moves the octopus randomly, which is not
+expected to yield a very good score. But, you can run it to test that everything is working
+for you as follows:
 
 ```bash
-$ npm install && npm run build
+$ git clone https://github.com/mdwelsh/octopusfarmer
+$ cd octopusfarmer
+$ yarn
+$ yarn workspace client build-start run -s 10
+Created client for game NS_f3wnwuUsIzgEfSjSVQ
+Starting game NS_f3wnwuUsIzgEfSjSVQ - live display: https://octopusfarmer.com/game/NS_f3wnwuUsIzgEfSjSVQ
+Running for 10 steps (cur score 0):     100%[==============================================================>] done
+Finished running, final score: 0
 ```
 
-## Running the program
+Here, the `-s 10` flag tells the client to run for only 10 steps, which is too short for the
+octopus to catch any fish, so the final score should be 0.
 
-```bash
-$ node ./dist/octofarm.js
+## The REST API
+
+The REST API for the Octopus Farmer game is very simple.
+
+### Creating a game
+
+To create a game, make a POST request to `https://octopusfarmer.com/api/games` with an empty body.
+The response will be a JSON object containing the properties:
+
+- `gameId`: the unique identifier for the game.
+- `world`: the initial state of the game world, as described below.
+
+### Getting the current state of the game
+
+To get the current state of the game, make a GET request to `https://octopusfarmer.com/api/game/<gameId>`,
+where `<gameId>` is the unique identifier for the game. The response will be a JSON object containing
+the properties:
+
+- `gameId`: the unique identifier for the game.
+- `world`: the current state of the game world, as described below.
+
+### Moving the Octopus
+
+To move the octopus, make a POST request to `https://octopusfarmer.com/api/game/<gameId>` with
+a JSON body containing the following:
+
+```
+{
+  "octopus": { "x": <x position to move to>, "y": <y position to move to> },
+  "moves": <current value of world.moves property>
+}
 ```
 
-There are two ways to run the game.
+where `<gameId>` is the unique identifier for the game. The `x` and `y` properties of the `octopus`
+object should be the X and Y coordinates where the octopus should move.
 
-- `node ./dist/octofarm.js run` will run the game with a live, text-based display showing the
-  octopus, fish, and current score. You can control the octopus with the arrow keys.
-- `node ./dist/octofarm.js farm` will run the game in a headless mode, only showing the
-  summary statistics. This is much faster and good for testing your octopus logic over a long
-  run.
+The `moves` property should contain the most recent value of the `moves` property from the
+world state, as described in further detail below. This is a simple check to ensure that you
+are not making moves based on stale information; if you send a move with a stale `moves` value,
+the server will return an error.
+
+Note that the octopus may only move up to a certain distance from its current position on each
+move, according to the `octopus.speed` property in the world state. If you attempt to move the
+octopus too far, the server will return an error.
+
+Upon a successful move, the server will return a JSON object containing the properties:
+
+- `gameId`: the unique identifier for the game.
+- `world`: the updated state of the game world, as described below.
+
+## The world state object
+
+The state of the game world is reflected in the `world` object returned by the API. It contains
+information about the size of the world, the location of each fish, and the location of the
+octopus.
 
 ## Your job: Writing the `MyOctopus` class
 

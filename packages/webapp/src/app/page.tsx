@@ -2,7 +2,7 @@
 
 'use client';
 import styles from './page.module.css';
-import { GameData } from '@/lib/World';
+import { GameData } from 'octofarm-types';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Trash } from '@phosphor-icons/react';

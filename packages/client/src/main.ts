@@ -2,7 +2,7 @@
 
 import { program } from 'commander';
 import { Client } from './client.js';
-import { GameData, OctopusPosition } from './types.js';
+import { GameData, OctopusPosition } from 'octofarm-types';
 
 function dumbOctopus(game: GameData): OctopusPosition {
 	const x = game.world.octopus.x + (Math.random() < 0.5 ? 1 : -1);

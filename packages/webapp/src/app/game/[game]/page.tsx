@@ -2,7 +2,7 @@
 import styles from '../../../page.module.css';
 import { useState, useEffect } from 'react';
 import React from 'react';
-import { GameData } from '@/lib/World';
+import { GameData } from 'octofarm-types';
 import { WorldView } from '@/components/worldview';
 import { Button } from '@/components/ui/button';
 import { Play, PlayPause, Pause } from '@phosphor-icons/react';

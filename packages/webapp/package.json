@@ -29,6 +29,7 @@
 		"lucide-react": "^0.256.0",
 		"nanoid": "^4.0.2",
 		"next": "^13.4.7",
+		"octofarm-types": "*",
 		"postcss": "8.4.24",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",

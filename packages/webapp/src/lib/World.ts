@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { WorldData, TentacleData, OctopusData, FishData, FishGroupData } from 'octofarm-types';
 
 /** Initial speed for the Octopus. */
 const INIT_SPEED = 5;
@@ -8,61 +9,6 @@ const INIT_TENTACLES = 4;
 const INIT_REACH = 5;
 /** Initial attack power for the Octopus. */
 const INIT_ATTACK_POWER = 25;
-
-/** This is the external Redis representation of a Game. */
-export interface GameData {
-	gameId: string;
-	world: WorldData;
-}
-
-/** This is the external Redis representation of the World. */
-export interface WorldData {
-	width: number;
-	height: number;
-	moves: number;
-	score: number;
-	octopus: OctopusData;
-	fishGroups: FishGroupData[];
-}
-
-/** This is the external Redis representation of the Octopus. */
-export interface OctopusData {
-	x: number;
-	y: number;
-	speed: number;
-	reach: number;
-	attack: number;
-	tentacles: TentacleData[];
-}
-
-/** This is the external Redis representation of a Tentacle. */
-export interface TentacleData {
-	fishId: string | null;
-}
-
-/** This is the external Redis representation of a FishGroup. */
-export interface FishGroupData {
-	fishes: FishData[];
-	glyph: string;
-	center_x: number;
-	center_y: number;
-	radius: number;
-	numFishes: number;
-	health: number;
-	value: number;
-	speed: number;
-	fright: number;
-	spawnRate: number;
-	lastSpawn: number;
-}
-
-/** This is the external Redis representation of a Fish. */
-export interface FishData {
-	id: string;
-	x: number;
-	y: number;
-	health: number;
-}
 
 /** A Fish, which the Octopus wants to eat. */
 export class Fish {
@@ -323,7 +269,7 @@ export class Octopus {
 		}
 
 		// Sort fish by distance.
-		let fishByDistance = [];
+		let fishByDistance: Fish[] = [];
 		for (let fishGroup of this.world.fishGroups) {
 			for (let fish of fishGroup.fishes) {
 				if (this.canReach(fish)) {

@@ -1,4 +1,4 @@
-import { GameData, MoveData, OctopusPosition, WorldData } from './types.js';
+import { GameData, MoveData, OctopusPosition, WorldData } from 'octofarm-types';
 
 import terminal from 'terminal-kit';
 const { terminal: term } = terminal;
