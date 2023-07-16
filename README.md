@@ -160,7 +160,8 @@ octopus.
 }
 ```
 
-The world is a rectangular grid of cells, with the top-left cell being (0, 0) and the bottom-right being ( `width` -1, `height` -1). The octopus and any number of fish can
+The world is a rectangular grid of cells, with the top-left cell being (0, 0) and the
+bottom-right being ( `width-1`, `height-1`). The octopus and any number of fish can
 occupy a single cell at one time; there is no concept of collisions in this game.
 
 The `moves` parameter represents the number of moves made by the octopus so far in this
