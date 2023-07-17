@@ -22,8 +22,7 @@
 		"test": "turbo run test",
 		"format-for-turbo": "prettier --write .",
 		"format:check": "prettier . --check",
-		"format": "turbo format-for-turbo",
-		"publish-ai-jsx": "turbo test && turbo build && cd packages/ai-jsx && npm publish"
+		"format": "turbo format-for-turbo"
 	},
 	"volta": {
 		"node": "18.16.0",
