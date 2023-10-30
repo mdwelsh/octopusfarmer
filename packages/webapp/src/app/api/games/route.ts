@@ -24,10 +24,14 @@ export async function GET(req: Request): Promise<Response> {
 	} while (cursor !== 0);
 
 	// Return only the top ten games by score.
-	const scores = await Promise.all(gameIds.map(async (gameId) => {
-		return { gameId: gameId, score: parseInt((await kv.json.get(`game:${gameId}`, '$..score'))[0]) };
-	}));
-	scores.sort((a, b) => { return b.score - a.score; });
+	const scores = await Promise.all(
+		gameIds.map(async (gameId) => {
+			return { gameId: gameId, score: parseInt((await kv.json.get(`game:${gameId}`, '$..score'))[0]) };
+		})
+	);
+	scores.sort((a, b) => {
+		return b.score - a.score;
+	});
 
 	let response: GameMetadata[] = [];
 	for (const gameId of scores.slice(0, 10).map((score) => score.gameId)) {
@@ -50,34 +54,38 @@ export async function GET(req: Request): Promise<Response> {
 
 /** Create a new game. */
 export async function POST(req: Request): Promise<Response> {
-	const gameId = nanoid();
-	const body: unknown = await req.json();
-	const newGameRequest: NewGameRequest = body as NewGameRequest;
-	console.log(`Creating game ${gameId} with request ${JSON.stringify(newGameRequest)}`);
-	const world = new World({ newGame: newGameRequest as NewGameRequest });
-	const now = new Date().toISOString();
+	try {
+		const gameId = nanoid();
+		const body = (await req.json()) as NewGameRequest;
+		console.log(`Creating game ${gameId} with request ${JSON.stringify(body)}`);
+		const world = new World({ newGame: body });
+		const now = new Date().toISOString();
 
-	// Internal representation.
-	const gameDataInternal: GameDataInternal = {
-		gameId: gameId,
-		gameType: newGameRequest.gameType ?? 'normal',
-		owner: newGameRequest.owner,
-		seed: newGameRequest.seed,
-		created: now,
-		modified: now,
-		world: world.toWorldDataInternal(),
-	};
-	await saveGame(gameDataInternal);
+		// Internal representation.
+		const gameDataInternal: GameDataInternal = {
+			gameId: gameId,
+			gameType: body.gameType ?? 'normal',
+			owner: body.owner,
+			seed: body.seed,
+			created: now,
+			modified: now,
+			world: world.toWorldDataInternal(),
+		};
+		await saveGame(gameDataInternal);
 
-	// External representation.
-	const gameData: GameData = {
-		gameId: gameId,
-		owner: newGameRequest.owner,
-		created: now,
-		modified: now,
-		world: world.toWorldData(),
-	};
-	return new Response(JSON.stringify(gameData), {
-		headers: { 'content-type': 'application/json' },
-	});
+		// External representation.
+		const gameData: GameData = {
+			gameId: gameId,
+			owner: body.owner,
+			created: now,
+			modified: now,
+			world: world.toWorldData(),
+		};
+		return new Response(JSON.stringify(gameData), {
+			headers: { 'content-type': 'application/json' },
+		});
+	} catch (e: any) {
+		console.log(e);
+		return new Response(JSON.stringify({ error: e.message }), { status: 400 });
+	}
 }
