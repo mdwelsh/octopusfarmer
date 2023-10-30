@@ -2,10 +2,36 @@
  * This file contains type definitions for the game state.
  */
 
+export type GameType = "test" | "normal" | "hard" | "insane";
+
+/** A request to create a new game. */
+export type NewGameRequest = {
+	/** The email address of the game owner. This will be hidden from other players. */
+	owner: string;
+
+	/**
+	 * The game type to create. If unspecified, defaults to "normal".
+	 * 	 "test": A small, easy test game.
+	 * 	 "normal": A normal difficulty game.
+	 * 	 "hard": A hard difficulty game.
+	 * 	 "insane": An insanely difficult game.
+	 */
+	gameType?: GameType;
+
+	/**
+	 * The game world seed to use. If unspecified, a random seed will be provided.
+	 * You can set this for testing, which will ensure the starting state of the world
+	 * is consistent.
+	 */
+	seed?: number;
+}
+
 /** Represents a game. */
 export type GameData = {
 	/** The unique game ID. */
 	gameId: string;
+	/** Email address of the game creator. */
+	owner: string;
 	/** The date and time this game was created. */
 	created: string;
 	/** The date and time this game was last modified. */

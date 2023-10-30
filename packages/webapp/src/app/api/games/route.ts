@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import stringHash from 'string-hash';
 import { kv } from '@vercel/kv';
 import { World, GameDataInternal } from '@/lib/World';
-import { GameData, GameMetadata } from 'octofarm-types';
+import { GameData, GameMetadata, NewGameRequest } from 'octofarm-types';
 import { loadGame, saveGame } from '@/lib/storage';
 
 /** Return the game leaderboard. */
@@ -57,12 +57,17 @@ export async function GET(req: Request): Promise<Response> {
 /** Create a new game. */
 export async function POST(req: Request): Promise<Response> {
 	const gameId = nanoid();
-	const world = new World(undefined, 100, 100);
+	const body: unknown = req.body;
+	const newGameRequest: NewGameRequest = body as NewGameRequest;
+	const world = new World({ newGame: newGameRequest as NewGameRequest });
 	const now = new Date().toISOString();
 
 	// Internal representation.
 	const gameDataInternal: GameDataInternal = {
 		gameId: gameId,
+		gameType: newGameRequest.gameType ?? 'normal',
+		owner: newGameRequest.owner,
+		seed: newGameRequest.seed,
 		created: now,
 		modified: now,
 		world: world.toWorldDataInternal(),
@@ -72,6 +77,7 @@ export async function POST(req: Request): Promise<Response> {
 	// External representation.
 	const gameData: GameData = {
 		gameId: gameId,
+		owner: newGameRequest.owner,
 		created: now,
 		modified: now,
 		world: world.toWorldData(),
