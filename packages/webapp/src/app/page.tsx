@@ -48,11 +48,11 @@ function GameList() {
 				<div>Loading...</div>
 			) : (
 				<div>
-					<div>Leaderboard</div>
+					<div>Leaderboard <span className="text-slate-400">(only top 10 games shown)</span></div>
 					{games.map((game: GameMetadata, i: number) => (
 						<div className="flex flex-row gap-4 pt-4" key={i}>
-							hash: {game.hash} score: {game.score} moves: {game.moves} created:{' '}
-							{humanize.relativeTime(new Date(game.created).getTime() / 1000)} modified:{' '}
+							hash: {game.hash} {game.gameType && `type: ${game.gameType}`} score: {game.score} moves: {game.moves}{' '}
+							created: {humanize.relativeTime(new Date(game.created).getTime() / 1000)} modified:{' '}
 							{humanize.relativeTime(new Date(game.modified).getTime() / 1000)}
 						</div>
 					))}

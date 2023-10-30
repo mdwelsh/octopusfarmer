@@ -38,6 +38,7 @@ export async function GET(req: Request): Promise<Response> {
 			modified: gameDataInternal.modified,
 			score: gameDataInternal.world.score,
 			moves: gameDataInternal.world.moves,
+			gameType: gameDataInternal.gameType,
 		};
 		response.push(gameMetadata);
 	}

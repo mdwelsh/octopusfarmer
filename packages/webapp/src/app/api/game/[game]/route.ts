@@ -76,6 +76,7 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 			const newGameDataInternal: GameDataInternal = {
 				gameId: params.game,
 				gameType: gameDataInternal.gameType,
+				
 				created: gameDataInternal.created,
 				modified: new Date().toISOString(),
 				world: world.toWorldDataInternal(),

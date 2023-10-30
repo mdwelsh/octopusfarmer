@@ -99,21 +99,21 @@ export class Fish {
 			this.data.y = Math.max(0, Math.min(this.data.y + my, this.world.data.height - 1));
 		}
 		// If we are under attack, then move away from the Octopus.
-		if (this.underAttack() && this.world.prng() < this.group.data.fright) {
-			const octopus = this.world.octopus;
-			if (this.data.x < octopus.x) {
-				this.data.x = Math.max(0, this.data.x - this.group.data.speed);
-			}
-			if (this.data.x > octopus.x) {
-				this.data.x = Math.min(this.world.data.width - 1, this.data.x + this.group.data.speed);
-			}
-			if (this.data.y < octopus.y) {
-				this.data.y = Math.max(0, this.data.y - this.group.data.speed);
-			}
-			if (this.data.y > octopus.y) {
-				this.data.y = Math.min(this.world.data.height - 1, this.data.y + this.group.data.speed);
-			}
-		}
+		// if (this.underAttack() && this.world.prng() < this.group.data.fright) {
+		// 	const octopus = this.world.octopus;
+		// 	if (this.data.x < octopus.x) {
+		// 		this.data.x = Math.max(0, this.data.x - this.group.data.speed);
+		// 	}
+		// 	if (this.data.x > octopus.x) {
+		// 		this.data.x = Math.min(this.world.data.width - 1, this.data.x + this.group.data.speed);
+		// 	}
+		// 	if (this.data.y < octopus.y) {
+		// 		this.data.y = Math.max(0, this.data.y - this.group.data.speed);
+		// 	}
+		// 	if (this.data.y > octopus.y) {
+		// 		this.data.y = Math.min(this.world.data.height - 1, this.data.y + this.group.data.speed);
+		// 	}
+		// }
 	}
 
 	toFishData(): FishData {
@@ -354,10 +354,10 @@ export class World {
 						octopus: {
 							x: 50,
 							y: 50,
-							speed: INIT_SPEED,
-							tentacles: new Array(INIT_TENTACLES),
-							reach: INIT_REACH,
-							attack: INIT_ATTACK_POWER,
+							speed: 5,
+							tentacles: new Array(4),
+							reach: 5,
+							attack: 25,
 						},
 						fishGroups: [
 							{
@@ -375,8 +375,6 @@ export class World {
 					};
 					break;
 				case 'normal':
-				case 'hard':
-				case 'insane':
 					// Normal game is 500x500, with three fish groups.
 					// TODO: Implement hard and insane games as separate
 					// configurations.
@@ -388,43 +386,103 @@ export class World {
 						octopus: {
 							x: 250,
 							y: 250,
-							speed: INIT_SPEED,
-							tentacles: new Array(INIT_TENTACLES),
-							reach: INIT_REACH,
-							attack: INIT_ATTACK_POWER,
+							speed: 10,
+							tentacles: new Array(8),
+							reach: 20,
+							attack: 25,
 						},
 						fishGroups: [
 							{
 								center_x: this.prng() * 500,
 								center_y: this.prng() * 500,
-								radius: this.prng() * 20,
+								radius: 15,
+								numFishes: 20,
+								health: 25,
+								value: 10,
+								speed: 4,
+								fright: 0.1,
+								spawnRate: 50,
+							},
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 20,
 								numFishes: 10,
 								health: 100,
-								value: 10,
-								speed: 2,
-								fright: this.prng() * 0.1,
-								spawnRate: 50,
-							},
-							{
-								center_x: this.prng() * 500,
-								center_y: this.prng() * 500,
-								radius: this.prng() * 20,
-								numFishes: 10,
-								health: 200,
 								value: 20,
-								speed: 2,
-								fright: this.prng() * 0.2,
+								speed: 12,
+								fright: 0.2,
 								spawnRate: 50,
 							},
 							{
 								center_x: this.prng() * 500,
 								center_y: this.prng() * 500,
-								radius: this.prng() * 20,
-								numFishes: 10,
-								health: 400,
-								value: 40,
-								speed: 6,
-								fright: this.prng() * 0.4,
+								radius: 30,
+								numFishes: 5,
+								health: 200,
+								value: 100,
+								speed: 18,
+								fright: 0.4,
+								spawnRate: 50,
+							},
+						],
+					};
+					break;
+				case 'hard':
+					// Hard game is 500x500, with one fish group.
+					worldData = {
+						width: 500,
+						height: 500,
+						moves: 0,
+						score: 0,
+						octopus: {
+							x: 250,
+							y: 250,
+							speed: 10,
+							tentacles: new Array(8),
+							reach: 20,
+							attack: 25,
+						},
+						fishGroups: [
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 25,
+								numFishes: 50,
+								health: 100,
+								value: 100,
+								speed: 10,
+								fright: 0.25,
+								spawnRate: 50,
+							},
+						],
+					};
+					break;
+				case 'insane':
+					// Insane game is 500x500, with one fish!
+					worldData = {
+						width: 500,
+						height: 500,
+						moves: 0,
+						score: 0,
+						octopus: {
+							x: 250,
+							y: 250,
+							speed: 20,
+							tentacles: new Array(8),
+							reach: 20,
+							attack: 25,
+						},
+						fishGroups: [
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 25,
+								numFishes: 1,
+								health: 10000,
+								value: 100,
+								speed: 30,
+								fright: 0.5,
 								spawnRate: 50,
 							},
 						],
@@ -488,6 +546,7 @@ export class World {
 			...this.data,
 			fishGroups: this.fishGroups.map((fg) => fg.toFishGroupData()),
 			octopus: this.octopus.toOctopusData(),
+			prngState: this.prng.state(),
 		};
 	}
 

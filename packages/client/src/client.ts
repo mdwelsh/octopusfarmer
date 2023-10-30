@@ -4,7 +4,7 @@
  * is no requirement to do so.
  */
 
-import { GameData, GameType, MoveData, OctopusPosition, WorldData, NewGameRequest } from 'octofarm-types';
+import { GameData, MoveData, OctopusPosition, WorldData, NewGameRequest } from 'octofarm-types';
 
 import terminal from 'terminal-kit';
 const { terminal: term } = terminal;

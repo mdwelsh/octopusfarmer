@@ -18,7 +18,7 @@ import { GameData, OctopusPosition, GameMetadata, NewGameRequest } from 'octofar
 function dumbOctopus(game: GameData): OctopusPosition {
 	const x = game.world.octopus.x + (Math.random() < 0.5 ? 1 : -1);
 	const y = game.world.octopus.x + (Math.random() < 0.5 ? 1 : -1);
-	return { x: x, y: y } as OctopusPosition;
+	return { x, y } as OctopusPosition;
 }
 
 program
@@ -30,14 +30,16 @@ program
 /* The `run` command is used to run a game. */
 program
 	.command('run [gameId]')
-	.option('-t, --gameType <string>', 'Game type', 'normal')
-	.option('-s, --steps <int>', 'Total number of steps to run', '1000')
-	.option('-v, --view', 'Open a browser window to view the game')
+	.option('--owner <string>', 'Email address of game owner')
+	.option('--type <string>', 'Game type', 'normal')
+	.option('--seed <int>', 'Seed for game PRNG')
+	.option('--steps <int>', 'Total number of steps to run', '1000')
+	.option('--view', 'Open a browser window to view the game')
 	.action(async (gameId?: string, opts?) => {
-		console.log(`OPTS: ${JSON.stringify(opts)}`);
 		const newGameRequest: NewGameRequest = {
-			owner: '',
-			gameType: opts.gameType,
+			owner: opts.owner,
+			seed: opts.seed,
+			gameType: opts.type,
 		};
 		const client = await Client.Create(program.opts().url, gameId, newGameRequest);
 		if (program.opts().view) {

@@ -52,6 +52,8 @@ export type GameMetadata = {
 	moves: number;
 	/** The current score for this game. */
 	score: number;
+	/** The type of game. */
+	gameType: GameType;
 };
 
 /** Represents the world state for a given game. */
