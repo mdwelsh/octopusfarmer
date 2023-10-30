@@ -23,8 +23,14 @@ export async function GET(req: Request): Promise<Response> {
 		});
 	} while (cursor !== 0);
 
+	// Return only the top ten games by score.
+	const scores = await Promise.all(gameIds.map(async (gameId) => {
+		return { gameId: gameId, score: parseInt((await kv.json.get(`game:${gameId}`, '$..score'))[0]) };
+	}));
+	scores.sort((a, b) => { return b.score - a.score; });
+
 	let response: GameMetadata[] = [];
-	for (const gameId of gameIds) {
+	for (const gameId of scores.slice(0, 10).map((score) => score.gameId)) {
 		const gameDataInternal = await loadGame(gameId);
 		const gameMetadata: GameMetadata = {
 			hash: stringHash(gameId).toString(16),
@@ -35,19 +41,6 @@ export async function GET(req: Request): Promise<Response> {
 		};
 		response.push(gameMetadata);
 	}
-
-	// Sort by score, then by moves, then by modified date.
-	response.sort((a, b) => {
-		if (a.score !== b.score) {
-			return b.score - a.score;
-		}
-		if (a.moves !== b.moves) {
-			return a.moves - b.moves;
-		}
-		// Sort by modified date, most recent first.
-		return new Date(b.modified).getTime() - new Date(a.modified).getTime();
-	});
-
 	return new Response(JSON.stringify(response), {
 		headers: { 'content-type': 'application/json' },
 		status: 200,
@@ -57,8 +50,9 @@ export async function GET(req: Request): Promise<Response> {
 /** Create a new game. */
 export async function POST(req: Request): Promise<Response> {
 	const gameId = nanoid();
-	const body: unknown = req.body;
+	const body: unknown = await req.json();
 	const newGameRequest: NewGameRequest = body as NewGameRequest;
+	console.log(`Creating game ${gameId} with request ${JSON.stringify(newGameRequest)}`);
 	const world = new World({ newGame: newGameRequest as NewGameRequest });
 	const now = new Date().toISOString();
 

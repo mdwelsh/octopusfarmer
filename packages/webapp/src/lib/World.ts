@@ -340,6 +340,8 @@ export class World {
 		if (newGame !== undefined) {
 			// Create a new game.
 			this.prng = seedrandom(newGame.seed ? newGame.seed.toString() : undefined, { state: true });
+			newGame.gameType = newGame.gameType ?? 'normal';
+			console.log(`Creating new game - gameType ${newGame.gameType}, seed ${newGame.seed}`);
 			switch (newGame.gameType) {
 				case 'test':
 					worldData = {
@@ -369,6 +371,58 @@ export class World {
 							},
 						],
 					};
+					break;
+				case 'normal':
+					worldData = {
+						width: 500,
+						height: 500,
+						moves: 0,
+						score: 0,
+						octopus: {
+							x: 250,
+							y: 250,
+							speed: INIT_SPEED,
+							tentacles: new Array(INIT_TENTACLES),
+							reach: INIT_REACH,
+							attack: INIT_ATTACK_POWER,
+						},
+						fishGroups: [
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: this.prng() * 20,
+								numFishes: 10,
+								health: 100,
+								value: 10,
+								speed: 2,
+								fright: this.prng() * 0.1,
+								spawnRate: 50,
+							},
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: this.prng() * 20,
+								numFishes: 10,
+								health: 200,
+								value: 20,
+								speed: 2,
+								fright: this.prng() * 0.2,
+								spawnRate: 50,
+							},
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: this.prng() * 20,
+								numFishes: 10,
+								health: 400,
+								value: 40,
+								speed: 6,
+								fright: this.prng() * 0.4,
+								spawnRate: 50,
+							},
+						],
+					};
+					break;
 				default:
 					throw new Error(`Unknown game type ${newGame.gameType}`);
 			}
