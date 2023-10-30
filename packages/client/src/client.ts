@@ -69,14 +69,24 @@ export class Client {
 
 	// Create a new game.
 	async newGame(newGameRequest?: NewGameRequest): Promise<GameData> {
-		const res = await fetch(`${this.url}/api/games`, {
-			method: 'POST',
-			body: JSON.stringify(newGameRequest ?? {}),
-		});
-		if (!res.ok) {
-			throw new Error(`Unable to create game: ${JSON.stringify(res)}`);
+		console.log('MAKING NEW GAME!!!');
+		try {
+			const res = await fetch(`${this.url}/api/games`, {
+				method: 'POST',
+				body: JSON.stringify(newGameRequest ?? {}),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			if (!res.ok) {
+				throw new Error(`Unable to create game: ${JSON.stringify(res)}`);
+			}
+			return (await res.json()) as GameData;
+		} catch (e) {
+			console.log('ERROR MAKING NEW GAME!!!');
+			console.log(e);
+			throw e;
 		}
-		return (await res.json()) as GameData;
 	}
 
 	// Read the state of the current game.
