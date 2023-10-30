@@ -86,20 +86,20 @@ export class Fish {
 			this.world.allFish.delete(this.data.id);
 			return;
 		}
-		if (Math.random() < 0.25) {
-			let mx = Math.floor(Math.random() * this.group.data.speed);
-			if (Math.random() < 0.5) {
+		if (this.world.prng() < 0.25) {
+			let mx = Math.floor(this.world.prng() * this.group.data.speed);
+			if (this.world.prng() < 0.5) {
 				mx = -mx;
 			}
-			let my = Math.floor(Math.random() * this.group.data.speed);
-			if (Math.random() < 0.5) {
+			let my = Math.floor(this.world.prng() * this.group.data.speed);
+			if (this.world.prng() < 0.5) {
 				my = -my;
 			}
 			this.data.x = Math.max(0, Math.min(this.data.x + mx, this.world.data.width - 1));
 			this.data.y = Math.max(0, Math.min(this.data.y + my, this.world.data.height - 1));
 		}
 		// If we are under attack, then move away from the Octopus.
-		if (this.underAttack() && Math.random() < this.group.data.fright) {
+		if (this.underAttack() && this.world.prng() < this.group.data.fright) {
 			const octopus = this.world.octopus;
 			if (this.data.x < octopus.x) {
 				this.data.x = Math.max(0, this.data.x - this.group.data.speed);
@@ -136,11 +136,11 @@ export class FishGroup {
 			Array.from(Array(this.data.numFishes).keys()).map(() => {
 				const x = Math.max(
 					0,
-					Math.min(this.data.center_x + Math.floor(Math.random() * this.data.radius), world.data.width - 1)
+					Math.min(this.data.center_x + Math.floor(this.world.prng() * this.data.radius), world.data.width - 1)
 				);
 				const y = Math.max(
 					0,
-					Math.min(this.data.center_y + Math.floor(Math.random() * this.data.radius), world.data.height - 1)
+					Math.min(this.data.center_y + Math.floor(this.world.prng() * this.data.radius), world.data.height - 1)
 				);
 				return new Fish(this.world, this, { x, y, id: Fish.newId(), value: this.data.value, health: this.data.health });
 			});
@@ -158,11 +158,11 @@ export class FishGroup {
 			// Spawn a new fish.
 			const x = Math.max(
 				0,
-				Math.min(this.data.center_x + Math.floor(Math.random() * this.data.radius), this.world.data.width - 1)
+				Math.min(this.data.center_x + Math.floor(this.world.prng() * this.data.radius), this.world.data.width - 1)
 			);
 			const y = Math.max(
 				0,
-				Math.min(this.data.center_y + Math.floor(Math.random() * this.data.radius), this.world.data.height - 1)
+				Math.min(this.data.center_y + Math.floor(this.world.prng() * this.data.radius), this.world.data.height - 1)
 			);
 			this.fishes.push(
 				new Fish(this.world, this, { x, y, id: Fish.newId(), value: this.data.value, health: this.data.health })
@@ -344,6 +344,8 @@ export class World {
 			console.log(`Creating new game - gameType ${newGame.gameType}, seed ${newGame.seed}`);
 			switch (newGame.gameType) {
 				case 'test':
+					// The test game is a 100x100 world with a single fish group
+					// in the upper left corner.
 					worldData = {
 						width: 100,
 						height: 100,
@@ -373,6 +375,11 @@ export class World {
 					};
 					break;
 				case 'normal':
+				case 'hard':
+				case 'insane':
+					// Normal game is 500x500, with three fish groups.
+					// TODO: Implement hard and insane games as separate
+					// configurations.
 					worldData = {
 						width: 500,
 						height: 500,
