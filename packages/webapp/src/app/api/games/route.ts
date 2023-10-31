@@ -1,5 +1,6 @@
 export const runtime = 'edge';
 
+import { NextRequest, NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
 import stringHash from 'string-hash';
 import { kv } from '@vercel/kv';
@@ -53,7 +54,7 @@ export async function GET(req: Request): Promise<Response> {
 }
 
 /** Create a new game. */
-export async function POST(req: Request): Promise<Response> {
+export async function POST(req: NextRequest): Promise<Response> {
 	try {
 		const gameId = nanoid();
 		const rawBody = await req.text();
@@ -91,11 +92,9 @@ export async function POST(req: Request): Promise<Response> {
 			modified: now,
 			world: world.toWorldData(),
 		};
-		return new Response(JSON.stringify(gameData), {
-			headers: { 'content-type': 'application/json' },
-		});
+		return NextResponse.json(gameData, { status: 200 });
 	} catch (e: any) {
 		console.log(e);
-		return new Response(JSON.stringify({ error: e.message }), { status: 400 });
+		return NextResponse.json({ error: e.message }, { status: 400 });
 	}
 }
