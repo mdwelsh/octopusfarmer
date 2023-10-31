@@ -22,7 +22,7 @@
 		"terminal-kit": "^3.0.0"
 	},
 	"devDependencies": {
-		"@types/node": "^20.4.1",
+		"@types/node": "^18",
 		"@types/terminal-kit": "^2.5.1",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",

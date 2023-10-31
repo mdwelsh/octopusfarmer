@@ -4,7 +4,7 @@
  * is no requirement to do so.
  */
 
-import { GameData, MoveData, OctopusPosition, WorldData } from 'octofarm-types';
+import { GameData, MoveData, OctopusPosition, WorldData, NewGameRequest } from 'octofarm-types';
 
 import terminal from 'terminal-kit';
 const { terminal: term } = terminal;
@@ -29,14 +29,18 @@ export class Client {
 	 * @param gameId The ID of the game to connect to, or null to create a new game.
 	 * @returns A new Octopus Farmer client.
 	 */
-	public static async Create(url: string, gameId?: string | null): Promise<Client> {
+	public static async Create(
+		url: string,
+		gameId?: string | null,
+		newGameRequest?: NewGameRequest | undefined
+	): Promise<Client> {
 		const client = new Client();
 		client.url = url;
 		if (gameId) {
 			client.gameId = gameId;
 			client.game = await client.fetchGame();
 		} else {
-			client.game = await client.newGame();
+			client.game = await client.newGame(newGameRequest);
 			client.gameId = client.game.gameId;
 		}
 		console.log(`Created client for game ${client.gameId}`);
@@ -64,14 +68,24 @@ export class Client {
 	}
 
 	// Create a new game.
-	async newGame(): Promise<GameData> {
-		const res = await fetch(`${this.url}/api/games`, {
-			method: 'POST',
-		});
-		if (!res.ok) {
-			throw new Error(`Unable to create game: ${res}`);
+	async newGame(newGameRequest?: NewGameRequest): Promise<GameData> {
+		try {
+			const res = await fetch(`${this.url}/api/games`, {
+				method: 'POST',
+				body: JSON.stringify(newGameRequest ?? {}),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			if (!res.ok) {
+				throw new Error(`Unable to create game: ${JSON.stringify(res)}`);
+			}
+			return (await res.json()) as GameData;
+		} catch (e) {
+			console.error(`Error making new game: ${e}`);
+			console.error(e);
+			throw e;
 		}
-		return (await res.json()) as GameData;
 	}
 
 	// Read the state of the current game.

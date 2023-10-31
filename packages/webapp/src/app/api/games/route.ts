@@ -1,10 +1,11 @@
 export const runtime = 'edge';
 
+import { NextRequest, NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
 import stringHash from 'string-hash';
 import { kv } from '@vercel/kv';
 import { World, GameDataInternal } from '@/lib/World';
-import { GameData, GameMetadata } from 'octofarm-types';
+import { GameData, GameMetadata, NewGameRequest } from 'octofarm-types';
 import { loadGame, saveGame } from '@/lib/storage';
 
 /** Return the game leaderboard. */
@@ -23,8 +24,18 @@ export async function GET(req: Request): Promise<Response> {
 		});
 	} while (cursor !== 0);
 
+	// Return only the top ten games by score.
+	const scores = await Promise.all(
+		gameIds.map(async (gameId) => {
+			return { gameId: gameId, score: parseInt((await kv.json.get(`game:${gameId}`, '$..score'))[0]) };
+		})
+	);
+	scores.sort((a, b) => {
+		return b.score - a.score;
+	});
+
 	let response: GameMetadata[] = [];
-	for (const gameId of gameIds) {
+	for (const gameId of scores.slice(0, 10).map((score) => score.gameId)) {
 		const gameDataInternal = await loadGame(gameId);
 		const gameMetadata: GameMetadata = {
 			hash: stringHash(gameId).toString(16),
@@ -32,22 +43,10 @@ export async function GET(req: Request): Promise<Response> {
 			modified: gameDataInternal.modified,
 			score: gameDataInternal.world.score,
 			moves: gameDataInternal.world.moves,
+			gameType: gameDataInternal.gameType,
 		};
 		response.push(gameMetadata);
 	}
-
-	// Sort by score, then by moves, then by modified date.
-	response.sort((a, b) => {
-		if (a.score !== b.score) {
-			return b.score - a.score;
-		}
-		if (a.moves !== b.moves) {
-			return a.moves - b.moves;
-		}
-		// Sort by modified date, most recent first.
-		return new Date(b.modified).getTime() - new Date(a.modified).getTime();
-	});
-
 	return new Response(JSON.stringify(response), {
 		headers: { 'content-type': 'application/json' },
 		status: 200,
@@ -55,28 +54,47 @@ export async function GET(req: Request): Promise<Response> {
 }
 
 /** Create a new game. */
-export async function POST(req: Request): Promise<Response> {
-	const gameId = nanoid();
-	const world = new World(undefined, 100, 100);
-	const now = new Date().toISOString();
+export async function POST(req: NextRequest): Promise<Response> {
+	try {
+		const gameId = nanoid();
+		const rawBody = await req.text();
+		console.log(`Creating game ${gameId} with request ${rawBody}`);
+		let body: NewGameRequest;
+		if (!rawBody) {
+			body = {
+				owner: '',
+			};
+		} else {
+			body = JSON.parse(rawBody);
+		}
+		console.log(`Parsed request body as: ${JSON.stringify(body)}`);
+		const world = new World({ newGame: body });
+		const now = new Date().toISOString();
 
-	// Internal representation.
-	const gameDataInternal: GameDataInternal = {
-		gameId: gameId,
-		created: now,
-		modified: now,
-		world: world.toWorldDataInternal(),
-	};
-	await saveGame(gameDataInternal);
+		// Internal representation.
+		const gameDataInternal: GameDataInternal = {
+			gameId: gameId,
+			gameType: body.gameType ?? 'normal',
+			owner: body.owner,
+			seed: body.seed,
+			created: now,
+			modified: now,
+			world: world.toWorldDataInternal(),
+		};
+		await saveGame(gameDataInternal);
 
-	// External representation.
-	const gameData: GameData = {
-		gameId: gameId,
-		created: now,
-		modified: now,
-		world: world.toWorldData(),
-	};
-	return new Response(JSON.stringify(gameData), {
-		headers: { 'content-type': 'application/json' },
-	});
+		// External representation.
+		const gameData: GameData = {
+			gameId: gameId,
+			owner: body.owner,
+			created: now,
+			modified: now,
+			world: world.toWorldData(),
+		};
+		console.log('Completed new game request');
+		return NextResponse.json(gameData, { status: 200 });
+	} catch (e: any) {
+		console.error(e);
+		return NextResponse.json({ error: e.message }, { status: 400 });
+	}
 }

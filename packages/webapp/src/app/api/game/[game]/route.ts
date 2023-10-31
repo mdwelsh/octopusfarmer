@@ -11,9 +11,10 @@ type RouteSegment = { params: { game: string } };
 /** Return the current state of the given game. */
 export async function GET(req: Request, { params }: RouteSegment): Promise<Response> {
 	const gameDataInternal = await loadGame(params.game);
-	const world = new World(gameDataInternal.world);
+	const world = new World({ loadGame: gameDataInternal.world });
 	const gameData: GameData = {
 		gameId: params.game,
+		owner: gameDataInternal.owner ?? '',
 		created: gameDataInternal.created,
 		modified: gameDataInternal.modified,
 		world: world.toWorldData(),
@@ -64,9 +65,9 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 
 		// Get the game world state.
 		const gameDataInternal = await loadGame(params.game);
-		const world = new World(gameDataInternal.world);
+		const world = new World({ loadGame: gameDataInternal.world });
 
-		if (moves == world.moves) {
+		if (moves == world.data.moves) {
 			// Update the game state.
 			world.moveOctopus(body.octopus.x, body.octopus.y);
 			world.update();
@@ -74,6 +75,8 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 			// Write it back.
 			const newGameDataInternal: GameDataInternal = {
 				gameId: params.game,
+				gameType: gameDataInternal.gameType,
+				
 				created: gameDataInternal.created,
 				modified: new Date().toISOString(),
 				world: world.toWorldDataInternal(),
@@ -83,6 +86,7 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 			// Send reply.
 			const newGameData: GameData = {
 				gameId: params.game,
+				owner: gameDataInternal.owner ?? '',
 				created: newGameDataInternal.created,
 				modified: newGameDataInternal.modified,
 				world: world.toWorldData(),
@@ -91,8 +95,8 @@ export async function POST(req: Request, { params }: RouteSegment): Promise<Resp
 				headers: { 'content-type': 'application/json' },
 			});
 		} else {
-			console.log(`Dropping concurrent update for moves=${moves} world.moves=${world.moves}`);
-			throw new Error(`Ignoring concurrent update for moves=${moves} world.moves=${world.moves}`);
+			console.log(`Dropping concurrent update for moves=${moves} world.moves=${world.data.moves}`);
+			throw new Error(`Ignoring concurrent update for moves=${moves} world.moves=${world.data.moves}`);
 		}
 	} catch (e: any) {
 		console.log(e);

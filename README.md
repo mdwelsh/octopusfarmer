@@ -10,10 +10,20 @@ API, described below. Your job is to write a client program that interacts with 
 create a game and control the octopus to maximize your score.
 
 The server code itself can be found in the `packages/webapp` directory of this repo.
-You are not to modify the server in any way.
+You are not to modify the server in any way, but you are welcome to look at the code to
+inform your design. (Note, however, that games are randomly generated, so you won't be able
+to cheat by looking at the server code!)
 
 There is an example client, written in TypeScript, in the `packages/client` directory.
-Your own client code can be in any language you like.
+Your own client code can be in any language you like, but you are welcome to extend the
+TypeScript client code if you like.
+
+## Candidate instructions
+
+If you are a candidate for a position at Fixie, please **do not make a public fork of this repo**
+for your solution, and **do not send a pull request** to this repo. We want to avoid candidates
+using each other's code as a reference. Instead, you are welcome to make a **private** fork of
+this repo, and share that with us, or email us a ZIP file of your solution.
 
 ## Quick test
 
@@ -51,7 +61,8 @@ a given time. There is no concept of collisions in this game.
 The octopus has a number of tentacles, each of which can grab a single fish at a time. The
 octopus can only grab fish that are within a certain distance of the octopus. If a fish is
 grabbed by a tentacle, it will be held by that tentacle until it is killed or it moves out
-of range of the octopus.
+of range of the octopus. Note that you are not responsible for managing which fish are
+grabbed by tenacles; this happens automatically. All you need to do is move the octopus.
 
 On each time step, each fish that is held by a tentacle will have `attack` units subtracted from
 its health. If a fish's health drops to 0 or below, the fish is killed and the game score
@@ -73,11 +84,39 @@ The REST API for the Octopus Farmer game is very simple and is described below.
 
 ### Creating a game
 
-To create a game, make a POST request to `https://octopusfarmer.com/api/games` with an empty body.
+To create a game, make a POST request to `https://octopusfarmer.com/api/games` with the body:
+
+```
+{
+  "gameType": "test" | "normal" | "hard" | "insane",
+  "owner": "<your email address>"
+  "seed": <optional seed value>
+}
+```
+
+The `gameType` field indicates what type of game to start. If unspecified, the default is
+`normal`. The `test` game has a small number of fish that are weak and don't move very fast.
+The `normal` game has several groups of fish. The `hard` game has a single cluster of
+fast-moving, high-value fish. The `insane` game has a single very fast-moving fish.
+
+The `test` mode is a good place to start for debugging your code. `insane` is mostly for fun and
+we don't expect your solution to work well with it, if at all. `normal` and `hard` modes are
+more interesting to us from a scoring perspective.
+
+The `owner` field is an optional field you may populate with your email address, as a way
+of identifying your own games. We will never reveal your identity to anyone else, but this is
+a good way of conveying to us which games you have run with your own solution.
+
+The `seed` field is optional. If unspecified, a random seed will be used. If specified, the
+fish in the world will be generated and move according to a PRNG seeded with this value.
+This is a good way of testing your solution on a consistent set of input conditions and
+fish dynamics. For testing, we will run your solution using random seeds, so be sure your
+solution works even if this is not specified.
+
 The response will be a JSON object containing the properties:
 
-- `gameId`: the unique identifier for the game.
-- `world`: the initial state of the game world, as described below.
+* `gameId`: the unique identifier for the game.
+* `world`: the initial state of the game world, as described below.
 
 The `gameId` field is a secret token that represents your game -- keep it
 private! Anyone can use this `gameId` to interact with the game world (by
@@ -104,12 +143,12 @@ game world change in real time.
 
 ### Getting the current state of the game
 
-To get the current state of the game, make a GET request to `https://octopusfarmer.com/api/game/<gameId>` ,
+To get the current state of the game, make a GET request to `https://octopusfarmer.com/api/game/<gameId>` , 
 where `<gameId>` is the unique identifier for the game. The response will be a JSON object containing
 the properties:
 
-- `gameId`: the unique identifier for the game.
-- `world`: the current state of the game world, as described below.
+* `gameId`: the unique identifier for the game.
+* `world`: the current state of the game world, as described below.
 
 ### Moving the Octopus
 
@@ -128,20 +167,20 @@ a JSON body containing the following:
 
 where `<gameId>` is the unique identifier for the game. The `x` and `y` properties of the `octopus` object should be the X and Y coordinates where the octopus should move.
 
-Note that you do not have control over which fish, if any, the octopus will grab with its tentacles;
+Note that you do not have control over which fish, if any, the octopus will grab with its tentacles; 
 all you control is the position of the octopus. Note that the octopus may only move up to a certain
 distance from its current position on each move, according to the `octopus.speed` property in the
 world state. If you attempt to move the octopus too far, the server will return an error.
 
 The `moves` property should contain the most recent value of the `moves` property from the
 world state, as described in further detail below. This is a simple check to ensure that you
-are not making moves based on stale information; if you send a move with a stale `moves` value,
+are not making moves based on stale information; if you send a move with a stale `moves` value, 
 the server will return an error.
 
 Upon a successful move, the server will return a JSON object containing the properties:
 
-- `gameId`: the unique identifier for the game.
-- `world`: the updated state of the game world, as described below.
+* `gameId`: the unique identifier for the game.
+* `world`: the updated state of the game world, as described below.
 
 ## The world state object
 
@@ -161,7 +200,7 @@ octopus.
 ```
 
 The world is a rectangular grid of cells, with the top-left cell being (0, 0) and the
-bottom-right being ( `width-1`, `height-1`). The octopus and any number of fish can
+bottom-right being ( `width-1` , `height-1` ). The octopus and any number of fish can
 occupy a single cell at one time; there is no concept of collisions in this game.
 
 The `moves` parameter represents the number of moves made by the octopus so far in this
@@ -262,5 +301,22 @@ const gameId = '< game ID from a POST to /api/games >';
 const client = await Client.Create(url, gameId);
 client.run(dumbOctopus, 1000);
 ```
+
+## What we are looking for
+
+First of all, **do not spend more than 2-3 hours on this exercise.** If you spend much longer
+than this, we will have to discount whatever you share with us by the length of time it took
+you to come up with it; what we're looking for is your best effort within a reasonable timeframe.
+
+The goal of this exercise is to get a sense of your coding ability, both from an algorithmic
+perspective, as well as in terms of overall structure, clarity, and so forth. It is not necessary
+to implement the fanciest, most complex algorithm here; however, if your implementation is trivial,
+you'll likely get a somewhat middling score. We encourage you to be ambitious and creative,
+however, don't go overboard! We're not going to be particularly impressed by solutions that 
+require an hour of reading the code just to udnerstand what you're doing.
+
+We do care very much about code quality, style, architecture, and testing. Imagine you are
+sending us a PR for part of our company codebase; show us how you would do this normally,
+not just for a throwaway project.
 
 Good luck!

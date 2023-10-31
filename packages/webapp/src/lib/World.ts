@@ -1,5 +1,7 @@
 import { nanoid } from 'nanoid';
-import { WorldData, TentacleData, OctopusData, FishData } from 'octofarm-types';
+import seedrandom, { StatefulPRNG, State } from 'seedrandom';
+
+import { GameType, NewGameRequest, WorldData, TentacleData, OctopusData, FishData } from 'octofarm-types';
 
 /** Initial speed for the Octopus. */
 const INIT_SPEED = 5;
@@ -12,8 +14,6 @@ const INIT_ATTACK_POWER = 25;
 
 /** Internal representation of a group of fish. */
 export type FishGroupData = {
-	fishes: FishData[];
-	glyph: string;
 	center_x: number;
 	center_y: number;
 	radius: number;
@@ -23,7 +23,8 @@ export type FishGroupData = {
 	speed: number;
 	fright: number;
 	spawnRate: number;
-	lastSpawn: number;
+	fishes?: FishData[];
+	lastSpawn?: number;
 };
 
 /** Internal representation of the world state for a given game. */
@@ -34,11 +35,15 @@ export type WorldDataInternal = {
 	score: number;
 	octopus: OctopusData;
 	fishGroups: FishGroupData[];
+	prngState?: object;
 };
 
 /** Internal representation of a single game state. */
 export type GameDataInternal = {
 	gameId: string;
+	gameType: GameType;
+	owner?: string;
+	seed?: number;
 	created: string;
 	modified: string;
 	world: WorldDataInternal;
@@ -46,21 +51,15 @@ export type GameDataInternal = {
 
 /** A Fish, which the Octopus wants to eat. */
 export class Fish {
-	id: string;
 	world: World;
 	group: FishGroup;
-	x: number;
-	y: number;
-	health: number;
+	data: FishData;
 
-	constructor(world: World, group: FishGroup, x: number, y: number, id?: string, health?: number) {
-		this.id = id ?? Fish.newId();
+	constructor(world: World, group: FishGroup, data: FishData) {
 		this.world = world;
 		this.group = group;
-		this.x = x;
-		this.y = y;
-		this.health = health ?? group.health;
-		this.world.allFish.set(this.id, this);
+		this.data = data;
+		this.world.allFish.set(this.data.id, this);
 	}
 
 	static newId(): string {
@@ -80,103 +79,70 @@ export class Fish {
 
 	/** Update the Fish's status. */
 	update(): void {
-		if (this.health <= 0) {
+		if (this.data.health <= 0) {
 			// Remove this fish from the group.
 			this.group.fishes = this.group.fishes.filter((f) => f != this);
 			// Remove this fish from the world.
-			this.world.allFish.delete(this.id);
+			this.world.allFish.delete(this.data.id);
 			return;
 		}
-		if (Math.random() < 0.25) {
-			let mx = Math.floor(Math.random() * this.group.speed);
-			if (Math.random() < 0.5) {
+		if (this.world.prng() < 0.25) {
+			let mx = Math.floor(this.world.prng() * this.group.data.speed);
+			if (this.world.prng() < 0.5) {
 				mx = -mx;
 			}
-			let my = Math.floor(Math.random() * this.group.speed);
-			if (Math.random() < 0.5) {
+			let my = Math.floor(this.world.prng() * this.group.data.speed);
+			if (this.world.prng() < 0.5) {
 				my = -my;
 			}
-			this.x = Math.max(0, Math.min(this.x + mx, this.world.width - 1));
-			this.y = Math.max(0, Math.min(this.y + my, this.world.height - 1));
+			this.data.x = Math.max(0, Math.min(this.data.x + mx, this.world.data.width - 1));
+			this.data.y = Math.max(0, Math.min(this.data.y + my, this.world.data.height - 1));
 		}
 		// If we are under attack, then move away from the Octopus.
-		if (this.underAttack() && Math.random() < this.group.fright) {
-			const octopus = this.world.octopus;
-			if (this.x < octopus.x) {
-				this.x = Math.max(0, this.x - this.group.speed);
-			}
-			if (this.x > octopus.x) {
-				this.x = Math.min(this.world.width - 1, this.x + this.group.speed);
-			}
-			if (this.y < octopus.y) {
-				this.y = Math.max(0, this.y - this.group.speed);
-			}
-			if (this.y > octopus.y) {
-				this.y = Math.min(this.world.height - 1, this.y + this.group.speed);
-			}
-		}
+		// if (this.underAttack() && this.world.prng() < this.group.data.fright) {
+		// 	const octopus = this.world.octopus;
+		// 	if (this.data.x < octopus.x) {
+		// 		this.data.x = Math.max(0, this.data.x - this.group.data.speed);
+		// 	}
+		// 	if (this.data.x > octopus.x) {
+		// 		this.data.x = Math.min(this.world.data.width - 1, this.data.x + this.group.data.speed);
+		// 	}
+		// 	if (this.data.y < octopus.y) {
+		// 		this.data.y = Math.max(0, this.data.y - this.group.data.speed);
+		// 	}
+		// 	if (this.data.y > octopus.y) {
+		// 		this.data.y = Math.min(this.world.data.height - 1, this.data.y + this.group.data.speed);
+		// 	}
+		// }
 	}
 
 	toFishData(): FishData {
-		return {
-			id: this.id,
-			x: this.x,
-			y: this.y,
-			health: this.health,
-			value: this.group.value,
-		};
+		return this.data;
 	}
 }
 
 /** Represents a group of Fish with the same basic properties, clustered around a center point. */
 export class FishGroup {
-	fishes: Fish[];
 	world: World;
-	glyph: string;
-	center_x: number;
-	center_y: number;
-	radius: number;
-	numFishes: number;
-	health: number;
-	value: number;
-	speed: number;
-	fright: number;
-	spawnRate: number;
-	lastSpawn: number;
+	data: FishGroupData;
+	fishes: Fish[];
 
-	constructor(
-		world: World,
-		data?: FishGroupData,
-		glyph?: string,
-		center_x?: number,
-		center_y?: number,
-		radius?: number,
-		numFishes?: number,
-		health?: number,
-		value?: number,
-		speed?: number,
-		fright?: number,
-		spawnRate?: number
-	) {
+	constructor(world: World, data: FishGroupData) {
 		this.world = world;
-		this.glyph = data?.glyph ?? glyph!;
-		this.center_x = data?.center_x ?? center_x!;
-		this.center_y = data?.center_y ?? center_y!;
-		this.radius = data?.radius ?? radius!;
-		this.numFishes = data?.numFishes ?? numFishes!;
-		this.health = data?.health ?? health!;
-		this.value = data?.value ?? value!;
-		this.speed = data?.speed ?? speed!;
-		this.fright = data?.fright ?? fright!;
-		this.spawnRate = data?.spawnRate ?? spawnRate!;
-		this.lastSpawn = data?.lastSpawn ?? 0;
-
+		this.data = data;
+		this.data.lastSpawn = this.data.lastSpawn ?? 0;
 		this.fishes =
-			data?.fishes?.map((f) => new Fish(world, this, f.x, f.y, f.id, f.health)) ??
-			Array.from(Array(this.numFishes).keys()).map(() => {
-				const x = Math.max(0, Math.min(this.center_x + Math.floor(Math.random() * this.radius), world.width - 1));
-				const y = Math.max(0, Math.min(this.center_y + Math.floor(Math.random() * this.radius), world.height - 1));
-				return new Fish(this.world, this, x, y);
+			data?.fishes?.map((f) => new Fish(world, this, f)) ??
+			Array.from(Array(this.data.numFishes).keys()).map(() => {
+				const x = Math.max(
+					0,
+					Math.min(this.data.center_x + Math.floor(this.world.prng() * this.data.radius), world.data.width - 1)
+				);
+				const y = Math.max(
+					0,
+					Math.min(this.data.center_y + Math.floor(this.world.prng() * this.data.radius), world.data.height - 1)
+				);
+				return new Fish(this.world, this, { x, y, id: Fish.newId(), value: this.data.value, health: this.data.health });
 			});
 	}
 
@@ -185,27 +151,29 @@ export class FishGroup {
 		for (let fish of this.fishes) {
 			fish.update();
 		}
-		if (this.fishes.length < this.numFishes && this.world.moves - this.lastSpawn > this.spawnRate) {
-			const x = Math.max(0, Math.min(this.center_x + Math.floor(Math.random() * this.radius), this.world.width - 1));
-			const y = Math.max(0, Math.min(this.center_y + Math.floor(Math.random() * this.radius), this.world.height - 1));
-			this.fishes.push(new Fish(this.world, this, x, y));
-			this.lastSpawn = this.world.moves;
+		if (
+			this.fishes.length < this.data.numFishes &&
+			this.world.data.moves - (this.data.lastSpawn ?? 0) > this.data.spawnRate
+		) {
+			// Spawn a new fish.
+			const x = Math.max(
+				0,
+				Math.min(this.data.center_x + Math.floor(this.world.prng() * this.data.radius), this.world.data.width - 1)
+			);
+			const y = Math.max(
+				0,
+				Math.min(this.data.center_y + Math.floor(this.world.prng() * this.data.radius), this.world.data.height - 1)
+			);
+			this.fishes.push(
+				new Fish(this.world, this, { x, y, id: Fish.newId(), value: this.data.value, health: this.data.health })
+			);
+			this.data.lastSpawn = this.world.data.moves;
 		}
 	}
 
 	toFishGroupData(): FishGroupData {
 		return {
-			glyph: this.glyph,
-			center_x: this.center_x,
-			center_y: this.center_y,
-			radius: this.radius,
-			numFishes: this.numFishes,
-			health: this.health,
-			value: this.value,
-			speed: this.speed,
-			fright: this.fright,
-			spawnRate: this.spawnRate,
-			lastSpawn: this.lastSpawn,
+			...this.data,
 			fishes: this.fishes.map((fish) => fish.toFishData()),
 		};
 	}
@@ -261,7 +229,7 @@ export class Octopus {
 			reach: this.reach,
 			attack: this.attack,
 			tentacles: this.tentacles.map((tentacle: Fish | null) => {
-				return { fishId: tentacle ? tentacle.id : null };
+				return { fishId: tentacle ? tentacle.data.id : null };
 			}),
 		};
 	}
@@ -272,8 +240,8 @@ export class Octopus {
 	 */
 	moveTo(x: number, y: number): void {
 		if (this.distance(x, y) <= this.speed) {
-			this.x = Math.max(0, Math.min(this.world.width - 1, x));
-			this.y = Math.max(0, Math.min(this.world.width - 1, y));
+			this.x = Math.max(0, Math.min(this.world.data.width - 1, x));
+			this.y = Math.max(0, Math.min(this.world.data.width - 1, y));
 		} else {
 			throw new Error(`Cannot move to coordinates that are more than ${this.speed} units away`);
 		}
@@ -286,7 +254,7 @@ export class Octopus {
 
 	/** Return true if the given fish is within this.reach units of this octopus. */
 	canReach(fish: Fish): boolean {
-		return this.distance(fish.x, fish.y) <= this.reach;
+		return this.distance(fish.data.x, fish.data.y) <= this.reach;
 	}
 
 	/** Update the state of this octopus on each game step. */
@@ -295,7 +263,7 @@ export class Octopus {
 		for (let tentacle of this.tentacles) {
 			if (tentacle && !this.canReach(tentacle)) {
 				// Fish goes out of range and immediately heals.
-				tentacle.health = tentacle.group.health;
+				tentacle.data.health = tentacle.group.data.health;
 				const index = this.tentacles.indexOf(tentacle);
 				if (index != -1) {
 					this.tentacles[index] = null;
@@ -312,7 +280,7 @@ export class Octopus {
 				}
 			}
 		}
-		fishByDistance.sort((a, b) => this.distance(a.x, a.y) - this.distance(b.x, b.y));
+		fishByDistance.sort((a, b) => this.distance(a.data.x, a.data.y) - this.distance(b.data.x, b.data.y));
 
 		// Grab any fish that we don't already have in our tentacles.
 		for (let fish of fishByDistance) {
@@ -330,11 +298,11 @@ export class Octopus {
 
 		// Attack any fish that we have in our tentacles.
 		for (let tentacle of this.tentacles) {
-			if (tentacle && tentacle.health > 0) {
-				tentacle.health -= this.attack;
-				if (tentacle.health <= 0) {
+			if (tentacle && tentacle.data.health > 0) {
+				tentacle.data.health -= this.attack;
+				if (tentacle.data.health <= 0) {
 					// We killed a fish. It will be removed from the world on the next update.
-					this.world.score += tentacle.group.value;
+					this.world.data.score += tentacle.group.data.value;
 					// Remove this fish from our tentacles.
 					const index = this.tentacles.indexOf(tentacle);
 					if (index != -1) {
@@ -348,54 +316,189 @@ export class Octopus {
 
 /** Represents the game world. */
 export class World {
-	width: number;
-	height: number;
-	moves: number;
-	score: number;
+	data: WorldDataInternal;
 	fishGroups: FishGroup[];
 	octopus: Octopus;
 	allFish: Map<string, Fish>;
+	prng: StatefulPRNG<State.Arc4>;
 
-	constructor(data?: WorldDataInternal, width?: number, height?: number) {
-		this.width = data?.width ?? width!;
-		this.height = data?.height ?? height!;
-		this.moves = data?.moves ?? 0;
-		this.score = data?.score ?? 0;
+	/**
+	 * Initialize a game world instance.
+	 *
+	 * This is initialized either from a WorldDataInternal object, or from a NewGameRequest.
+	 */
+	constructor({ newGame, loadGame }: { newGame?: NewGameRequest; loadGame?: WorldDataInternal }) {
+		if (newGame === undefined && loadGame === undefined) {
+			throw new Error('Must provide either newGame or loadGame');
+		}
+		if (newGame !== undefined && loadGame !== undefined) {
+			throw new Error('Cannot provide both newGame and loadGame');
+		}
 		this.allFish = new Map();
+		let worldData: WorldDataInternal;
 
-		this.fishGroups = data?.fishGroups
-			? data.fishGroups.map((groupData) => new FishGroup(this, groupData))
-			: [
-					new FishGroup(this, undefined, '*', 5, 5, 5, 5, 100, 10, 1, 0.0, 50),
-					new FishGroup(
-						this,
-						undefined,
-						'<',
-						Math.floor(width! / 2) + 5,
-						Math.floor(height! / 2) - 5,
-						3,
-						5,
-						150,
-						10,
-						2,
-						0.1,
-						50
-					),
-					new FishGroup(this, undefined, '>', width! - 20, height! - 30, 4, 10, 175, 10, 3, 0.2, 50),
-			  ];
-
-		this.octopus = data?.octopus
-			? new Octopus(this, data?.octopus)
-			: new Octopus(
-					this,
-					undefined,
-					Math.floor(width! / 2),
-					Math.floor(height! / 2),
-					INIT_SPEED,
-					INIT_TENTACLES,
-					INIT_REACH,
-					INIT_ATTACK_POWER
-			  );
+		if (newGame !== undefined) {
+			// Create a new game.
+			this.prng = seedrandom(newGame.seed ? newGame.seed.toString() : undefined, { state: true });
+			newGame.gameType = newGame.gameType ?? 'normal';
+			console.log(`Creating new game - gameType ${newGame.gameType}, seed ${newGame.seed}`);
+			switch (newGame.gameType) {
+				case 'test':
+					// The test game is a 100x100 world with a single fish group
+					// in the upper left corner.
+					worldData = {
+						width: 100,
+						height: 100,
+						moves: 0,
+						score: 0,
+						octopus: {
+							x: 50,
+							y: 50,
+							speed: 5,
+							tentacles: new Array(4),
+							reach: 5,
+							attack: 25,
+						},
+						fishGroups: [
+							{
+								center_x: 25,
+								center_y: 25,
+								radius: 10,
+								numFishes: 5,
+								health: 10,
+								value: 1,
+								speed: 2,
+								fright: 0,
+								spawnRate: 50,
+							},
+						],
+					};
+					break;
+				case 'normal':
+					// Normal game is 500x500, with three fish groups.
+					// TODO: Implement hard and insane games as separate
+					// configurations.
+					worldData = {
+						width: 500,
+						height: 500,
+						moves: 0,
+						score: 0,
+						octopus: {
+							x: 250,
+							y: 250,
+							speed: 10,
+							tentacles: new Array(8),
+							reach: 20,
+							attack: 25,
+						},
+						fishGroups: [
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 15,
+								numFishes: 20,
+								health: 25,
+								value: 10,
+								speed: 4,
+								fright: 0.1,
+								spawnRate: 50,
+							},
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 20,
+								numFishes: 10,
+								health: 100,
+								value: 20,
+								speed: 12,
+								fright: 0.2,
+								spawnRate: 50,
+							},
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 30,
+								numFishes: 5,
+								health: 200,
+								value: 100,
+								speed: 18,
+								fright: 0.4,
+								spawnRate: 50,
+							},
+						],
+					};
+					break;
+				case 'hard':
+					// Hard game is 500x500, with one fish group.
+					worldData = {
+						width: 500,
+						height: 500,
+						moves: 0,
+						score: 0,
+						octopus: {
+							x: 250,
+							y: 250,
+							speed: 10,
+							tentacles: new Array(8),
+							reach: 20,
+							attack: 25,
+						},
+						fishGroups: [
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 25,
+								numFishes: 50,
+								health: 100,
+								value: 100,
+								speed: 10,
+								fright: 0.25,
+								spawnRate: 50,
+							},
+						],
+					};
+					break;
+				case 'insane':
+					// Insane game is 500x500, with one fish!
+					worldData = {
+						width: 500,
+						height: 500,
+						moves: 0,
+						score: 0,
+						octopus: {
+							x: 250,
+							y: 250,
+							speed: 20,
+							tentacles: new Array(8),
+							reach: 20,
+							attack: 25,
+						},
+						fishGroups: [
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 25,
+								numFishes: 1,
+								health: 10000,
+								value: 100,
+								speed: 30,
+								fright: 0.5,
+								spawnRate: 50,
+							},
+						],
+					};
+					break;
+				default:
+					throw new Error(`Unknown game type ${newGame.gameType}`);
+			}
+		} else {
+			// Load game from provided state.
+			worldData = loadGame!;
+			this.prng = seedrandom('', { state: loadGame!.prngState as State.Arc4 });
+		}
+		this.data = worldData;
+		this.fishGroups = worldData!.fishGroups.map((groupData) => new FishGroup(this, groupData));
+		this.octopus = new Octopus(this, worldData!.octopus);
 	}
 
 	/** Move the octopus to the given position. */
@@ -405,7 +508,7 @@ export class World {
 
 	/** Update the state of the world. */
 	update(): void {
-		this.moves++;
+		this.data.moves++;
 		for (let fishGroup of this.fishGroups) {
 			fishGroup.update();
 		}
@@ -432,10 +535,7 @@ export class World {
 
 	toWorldData(): WorldData {
 		return {
-			width: this.width,
-			height: this.height,
-			moves: this.moves,
-			score: this.score,
+			...this.data,
 			fish: this.fishes().map((fish) => fish.toFishData()),
 			octopus: this.octopus.toOctopusData(),
 		};
@@ -443,12 +543,10 @@ export class World {
 
 	toWorldDataInternal(): WorldDataInternal {
 		return {
-			width: this.width,
-			height: this.height,
-			moves: this.moves,
-			score: this.score,
+			...this.data,
 			fishGroups: this.fishGroups.map((fg) => fg.toFishGroupData()),
 			octopus: this.octopus.toOctopusData(),
+			prngState: this.prng.state(),
 		};
 	}
 
