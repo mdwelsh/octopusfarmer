@@ -92,9 +92,10 @@ export async function POST(req: NextRequest): Promise<Response> {
 			modified: now,
 			world: world.toWorldData(),
 		};
+		console.log('Completed new game request');
 		return NextResponse.json(gameData, { status: 200 });
 	} catch (e: any) {
-		console.log(e);
+		console.error(e);
 		return NextResponse.json({ error: e.message }, { status: 400 });
 	}
 }
