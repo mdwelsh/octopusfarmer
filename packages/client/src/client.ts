@@ -73,7 +73,8 @@ export class Client {
 		try {
 			const res = await fetch(`${this.url}/api/games`, {
 				method: 'POST',
-				body: JSON.stringify(newGameRequest ?? {}),
+				//body: JSON.stringify(newGameRequest ?? {}),
+				body: JSON.stringify({}),
 				headers: {
 					'Content-Type': 'application/json',
 				},

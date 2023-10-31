@@ -56,8 +56,16 @@ export async function GET(req: Request): Promise<Response> {
 export async function POST(req: Request): Promise<Response> {
 	try {
 		const gameId = nanoid();
-		const body = (await req.json()) as NewGameRequest;
-		console.log(`Creating game ${gameId} with request ${JSON.stringify(body)}`);
+		const rawBody = await req.text();
+		console.log(`Creating game ${gameId} with request ${rawBody}`);
+
+		let body: NewGameRequest;
+		if (!rawBody) {
+			body = {};
+		} else {
+			body = JSON.parse(rawBody);
+		}
+		console.log(`Parsed request body as: ${JSON.stringify(body)}`);
 		const world = new World({ newGame: body });
 		const now = new Date().toISOString();
 
