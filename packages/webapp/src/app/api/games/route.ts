@@ -59,7 +59,6 @@ export async function POST(req: NextRequest): Promise<Response> {
 		const gameId = nanoid();
 		const rawBody = await req.text();
 		console.log(`Creating game ${gameId} with request ${rawBody}`);
-
 		let body: NewGameRequest;
 		if (!rawBody) {
 			body = {

@@ -69,14 +69,12 @@ export class Client {
 
 	// Create a new game.
 	async newGame(newGameRequest?: NewGameRequest): Promise<GameData> {
-		console.log('MAKING NEW GAME!!!');
 		try {
 			const res = await fetch(`${this.url}/api/games`, {
 				method: 'POST',
-				//body: JSON.stringify(newGameRequest ?? {}),
-				body: JSON.stringify({}),
+				body: JSON.stringify(newGameRequest ?? {}),
 				headers: {
-					'Content-Type': 'application/json',
+					"Content-Type": "application/json",
 				},
 			});
 			if (!res.ok) {
@@ -84,8 +82,8 @@ export class Client {
 			}
 			return (await res.json()) as GameData;
 		} catch (e) {
-			console.log('ERROR MAKING NEW GAME!!!');
-			console.log(e);
+			console.error(`Error making new game: ${e}`);
+			console.error(e);
 			throw e;
 		}
 	}
