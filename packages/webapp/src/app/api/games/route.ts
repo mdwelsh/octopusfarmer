@@ -61,7 +61,9 @@ export async function POST(req: Request): Promise<Response> {
 
 		let body: NewGameRequest;
 		if (!rawBody) {
-			body = {};
+			body = {
+				owner: '',
+			};
 		} else {
 			body = JSON.parse(rawBody);
 		}
