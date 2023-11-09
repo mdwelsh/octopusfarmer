@@ -90,21 +90,21 @@ export class Fish {
 			this.data.y = Math.max(0, Math.min(this.data.y + my, this.world.data.height - 1));
 		}
 		// If we are under attack, then move away from the Octopus.
-		// if (this.underAttack() && this.world.prng() < this.group.data.fright) {
-		// 	const octopus = this.world.octopus;
-		// 	if (this.data.x < octopus.x) {
-		// 		this.data.x = Math.max(0, this.data.x - this.group.data.speed);
-		// 	}
-		// 	if (this.data.x > octopus.x) {
-		// 		this.data.x = Math.min(this.world.data.width - 1, this.data.x + this.group.data.speed);
-		// 	}
-		// 	if (this.data.y < octopus.y) {
-		// 		this.data.y = Math.max(0, this.data.y - this.group.data.speed);
-		// 	}
-		// 	if (this.data.y > octopus.y) {
-		// 		this.data.y = Math.min(this.world.data.height - 1, this.data.y + this.group.data.speed);
-		// 	}
-		// }
+		if (this.underAttack() && this.world.prng() < this.group.data.fright) {
+		 	const octopus = this.world.octopus;
+		 	if (this.data.x < octopus.x) {
+		 		this.data.x = Math.max(0, this.data.x - this.group.data.speed);
+		 	}
+		 	if (this.data.x > octopus.x) {
+		 		this.data.x = Math.min(this.world.data.width - 1, this.data.x + this.group.data.speed);
+		 	}
+		 	if (this.data.y < octopus.y) {
+		 		this.data.y = Math.max(0, this.data.y - this.group.data.speed);
+		 	}
+		 	if (this.data.y > octopus.y) {
+		 		this.data.y = Math.min(this.world.data.height - 1, this.data.y + this.group.data.speed);
+		 	}
+		}
 	}
 
 	toFishData(): FishData {
@@ -345,7 +345,7 @@ export class World {
 						octopus: {
 							x: 50,
 							y: 50,
-							speed: 2,
+							speed: 4,
 							tentacles: new Array(4),
 							reach: 5,
 							attack: 25,
@@ -377,7 +377,7 @@ export class World {
 						octopus: {
 							x: 250,
 							y: 250,
-							speed: 2,
+							speed: 4,
 							tentacles: new Array(8),
 							reach: 5,
 							attack: 25,
@@ -451,7 +451,7 @@ export class World {
 						octopus: {
 							x: 250,
 							y: 250,
-							speed: 2,
+							speed: 4,
 							tentacles: new Array(8),
 							reach: 5,
 							attack: 25,
