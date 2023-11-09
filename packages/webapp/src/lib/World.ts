@@ -3,15 +3,6 @@ import seedrandom, { StatefulPRNG, State } from 'seedrandom';
 
 import { GameType, NewGameRequest, WorldData, TentacleData, OctopusData, FishData } from 'octofarm-types';
 
-/** Initial speed for the Octopus. */
-const INIT_SPEED = 5;
-/** Initial number of tentacles for the Octopus. */
-const INIT_TENTACLES = 4;
-/** Initial length of the Octopus's tentacles. */
-const INIT_REACH = 5;
-/** Initial attack power for the Octopus. */
-const INIT_ATTACK_POWER = 25;
-
 /** Internal representation of a group of fish. */
 export type FishGroupData = {
 	center_x: number;
@@ -354,7 +345,7 @@ export class World {
 						octopus: {
 							x: 50,
 							y: 50,
-							speed: 5,
+							speed: 2,
 							tentacles: new Array(4),
 							reach: 5,
 							attack: 25,
@@ -369,7 +360,7 @@ export class World {
 								value: 1,
 								speed: 2,
 								fright: 0,
-								spawnRate: 50,
+								spawnRate: 10,
 							},
 						],
 					};
@@ -386,9 +377,9 @@ export class World {
 						octopus: {
 							x: 250,
 							y: 250,
-							speed: 10,
+							speed: 2,
 							tentacles: new Array(8),
-							reach: 20,
+							reach: 5,
 							attack: 25,
 						},
 						fishGroups: [
@@ -401,7 +392,7 @@ export class World {
 								value: 10,
 								speed: 4,
 								fright: 0.1,
-								spawnRate: 50,
+								spawnRate: 2,
 							},
 							{
 								center_x: this.prng() * 500,
@@ -412,7 +403,7 @@ export class World {
 								value: 20,
 								speed: 12,
 								fright: 0.2,
-								spawnRate: 50,
+								spawnRate: 5,
 							},
 							{
 								center_x: this.prng() * 500,
@@ -423,7 +414,29 @@ export class World {
 								value: 100,
 								speed: 18,
 								fright: 0.4,
-								spawnRate: 50,
+								spawnRate: 10,
+							},
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 15,
+								numFishes: 20,
+								health: 25,
+								value: 10,
+								speed: 4,
+								fright: 0.1,
+								spawnRate: 2,
+							},
+							{
+								center_x: this.prng() * 500,
+								center_y: this.prng() * 500,
+								radius: 15,
+								numFishes: 20,
+								health: 25,
+								value: 10,
+								speed: 4,
+								fright: 0.1,
+								spawnRate: 2,
 							},
 						],
 					};
@@ -438,22 +451,22 @@ export class World {
 						octopus: {
 							x: 250,
 							y: 250,
-							speed: 10,
+							speed: 2,
 							tentacles: new Array(8),
-							reach: 20,
+							reach: 5,
 							attack: 25,
 						},
 						fishGroups: [
 							{
 								center_x: this.prng() * 500,
 								center_y: this.prng() * 500,
-								radius: 25,
+								radius: 100,
 								numFishes: 50,
 								health: 100,
 								value: 100,
 								speed: 10,
 								fright: 0.25,
-								spawnRate: 50,
+								spawnRate: 4,
 							},
 						],
 					};
@@ -468,9 +481,9 @@ export class World {
 						octopus: {
 							x: 250,
 							y: 250,
-							speed: 20,
+							speed: 10,
 							tentacles: new Array(8),
-							reach: 20,
+							reach: 10,
 							attack: 25,
 						},
 						fishGroups: [
@@ -480,10 +493,10 @@ export class World {
 								radius: 25,
 								numFishes: 1,
 								health: 10000,
-								value: 100,
+								value: 1000,
 								speed: 30,
 								fright: 0.5,
-								spawnRate: 50,
+								spawnRate: 1,
 							},
 						],
 					};
