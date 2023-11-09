@@ -74,7 +74,7 @@ export class Client {
 				method: 'POST',
 				body: JSON.stringify(newGameRequest ?? {}),
 				headers: {
-					"Content-Type": "application/json",
+					'Content-Type': 'application/json',
 				},
 			});
 			if (!res.ok) {

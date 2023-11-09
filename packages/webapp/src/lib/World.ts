@@ -91,19 +91,19 @@ export class Fish {
 		}
 		// If we are under attack, then move away from the Octopus.
 		if (this.underAttack() && this.world.prng() < this.group.data.fright) {
-		 	const octopus = this.world.octopus;
-		 	if (this.data.x < octopus.x) {
-		 		this.data.x = Math.max(0, this.data.x - this.group.data.speed);
-		 	}
-		 	if (this.data.x > octopus.x) {
-		 		this.data.x = Math.min(this.world.data.width - 1, this.data.x + this.group.data.speed);
-		 	}
-		 	if (this.data.y < octopus.y) {
-		 		this.data.y = Math.max(0, this.data.y - this.group.data.speed);
-		 	}
-		 	if (this.data.y > octopus.y) {
-		 		this.data.y = Math.min(this.world.data.height - 1, this.data.y + this.group.data.speed);
-		 	}
+			const octopus = this.world.octopus;
+			if (this.data.x < octopus.x) {
+				this.data.x = Math.max(0, this.data.x - this.group.data.speed);
+			}
+			if (this.data.x > octopus.x) {
+				this.data.x = Math.min(this.world.data.width - 1, this.data.x + this.group.data.speed);
+			}
+			if (this.data.y < octopus.y) {
+				this.data.y = Math.max(0, this.data.y - this.group.data.speed);
+			}
+			if (this.data.y > octopus.y) {
+				this.data.y = Math.min(this.world.data.height - 1, this.data.y + this.group.data.speed);
+			}
 		}
 	}
 
@@ -548,7 +548,10 @@ export class World {
 
 	toWorldData(): WorldData {
 		return {
-			...this.data,
+			width: this.data.width,
+			height: this.data.height,
+			moves: this.data.moves,
+			score: this.data.score,
 			fish: this.fishes().map((fish) => fish.toFishData()),
 			octopus: this.octopus.toOctopusData(),
 		};

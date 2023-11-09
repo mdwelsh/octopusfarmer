@@ -115,8 +115,8 @@ solution works even if this is not specified.
 
 The response will be a JSON object containing the properties:
 
-* `gameId`: the unique identifier for the game.
-* `world`: the initial state of the game world, as described below.
+- `gameId`: the unique identifier for the game.
+- `world`: the initial state of the game world, as described below.
 
 The `gameId` field is a secret token that represents your game -- keep it
 private! Anyone can use this `gameId` to interact with the game world (by
@@ -143,12 +143,12 @@ game world change in real time.
 
 ### Getting the current state of the game
 
-To get the current state of the game, make a GET request to `https://octopusfarmer.com/api/game/<gameId>` , 
+To get the current state of the game, make a GET request to `https://octopusfarmer.com/api/game/<gameId>` ,
 where `<gameId>` is the unique identifier for the game. The response will be a JSON object containing
 the properties:
 
-* `gameId`: the unique identifier for the game.
-* `world`: the current state of the game world, as described below.
+- `gameId`: the unique identifier for the game.
+- `world`: the current state of the game world, as described below.
 
 ### Moving the Octopus
 
@@ -167,20 +167,20 @@ a JSON body containing the following:
 
 where `<gameId>` is the unique identifier for the game. The `x` and `y` properties of the `octopus` object should be the X and Y coordinates where the octopus should move.
 
-Note that you do not have control over which fish, if any, the octopus will grab with its tentacles; 
+Note that you do not have control over which fish, if any, the octopus will grab with its tentacles;
 all you control is the position of the octopus. Note that the octopus may only move up to a certain
 distance from its current position on each move, according to the `octopus.speed` property in the
 world state. If you attempt to move the octopus too far, the server will return an error.
 
 The `moves` property should contain the most recent value of the `moves` property from the
 world state, as described in further detail below. This is a simple check to ensure that you
-are not making moves based on stale information; if you send a move with a stale `moves` value, 
+are not making moves based on stale information; if you send a move with a stale `moves` value,
 the server will return an error.
 
 Upon a successful move, the server will return a JSON object containing the properties:
 
-* `gameId`: the unique identifier for the game.
-* `world`: the updated state of the game world, as described below.
+- `gameId`: the unique identifier for the game.
+- `world`: the updated state of the game world, as described below.
 
 ## The world state object
 
@@ -312,7 +312,7 @@ The goal of this exercise is to get a sense of your coding ability, both from an
 perspective, as well as in terms of overall structure, clarity, and so forth. It is not necessary
 to implement the fanciest, most complex algorithm here; however, if your implementation is trivial,
 you'll likely get a somewhat middling score. We encourage you to be ambitious and creative,
-however, don't go overboard! We're not going to be particularly impressed by solutions that 
+however, don't go overboard! We're not going to be particularly impressed by solutions that
 require an hour of reading the code just to udnerstand what you're doing.
 
 We do care very much about code quality, style, architecture, and testing. Imagine you are

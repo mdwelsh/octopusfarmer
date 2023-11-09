@@ -2,7 +2,7 @@
  * This file contains type definitions for the game state.
  */
 
-export type GameType = "test" | "normal" | "hard" | "insane";
+export type GameType = 'test' | 'normal' | 'hard' | 'insane';
 
 /** A request to create a new game. */
 export type NewGameRequest = {
@@ -24,7 +24,7 @@ export type NewGameRequest = {
 	 * is consistent.
 	 */
 	seed?: number;
-}
+};
 
 /** Represents a game. */
 export type GameData = {
