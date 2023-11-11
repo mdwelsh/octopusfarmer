@@ -1,5 +1,5 @@
 /**
- * This file contains type definitions for the game state.
+ * This file contains type definitions for the Octopus Farmer game state.
  */
 
 export type GameType = 'test' | 'normal' | 'hard' | 'insane';

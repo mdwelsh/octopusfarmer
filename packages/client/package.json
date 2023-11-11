@@ -1,7 +1,8 @@
 {
-	"name": "client",
+	"name": "@mdwelsh/octofarm",
+	"description": "A client and CLI for the Octopus Farmer game.",
+	"homepage": "https://octopusfarmer.com",
 	"version": "0.1.0",
-	"private": true,
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
@@ -14,11 +15,12 @@
 	"files": [
 		"dist"
 	],
+	"bin": "./dist/main.js",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"dependencies": {
-		"@mdwelsh/octofarm-types": "*",
 		"commander": "^11.0.0",
 		"eslint": "^8.44.0",
-		"open": "^9.1.0",
 		"terminal-kit": "^3.0.0"
 	},
 	"devDependencies": {

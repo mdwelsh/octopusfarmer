@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import stringHash from 'string-hash';
 import { kv } from '@vercel/kv';
 import { World, GameDataInternal } from '@/lib/World';
-import { GameData, GameMetadata, NewGameRequest } from '@mdwelsh/octofarm-types';
+import { GameData, GameMetadata, NewGameRequest } from '@mdwelsh/octofarm';
 import { loadGame, saveGame } from '@/lib/storage';
 
 /** Return the game leaderboard. */

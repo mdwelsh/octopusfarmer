@@ -3,7 +3,7 @@ import styles from '../../../page.module.css';
 import stringHash from 'string-hash';
 import { useState, useEffect } from 'react';
 import React from 'react';
-import { GameData } from '@mdwelsh/octofarm-types';
+import { GameData } from '@mdwelsh/octofarm';
 import { WorldView } from '@/components/worldview';
 import { Trash } from '@phosphor-icons/react';
 import DeleteGameDialog from '@/components/deletegame';

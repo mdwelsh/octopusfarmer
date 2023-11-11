@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import seedrandom, { StatefulPRNG, State } from 'seedrandom';
 
-import { GameType, NewGameRequest, WorldData, TentacleData, OctopusData, FishData } from '@mdwelsh/octofarm-types';
+import { GameType, NewGameRequest, WorldData, TentacleData, OctopusData, FishData } from '@mdwelsh/octofarm';
 
 /** Internal representation of a group of fish. */
 export type FishGroupData = {

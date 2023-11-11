@@ -2,7 +2,7 @@ export const runtime = 'edge';
 
 import { kv } from '@vercel/kv';
 import { World } from '@/lib/World';
-import { GameData } from '@mdwelsh/octofarm-types';
+import { GameData } from '@mdwelsh/octofarm';
 import { GameDataInternal } from '@/lib/World';
 import { loadGame, saveGame } from '@/lib/storage';
 

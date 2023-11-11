@@ -1,25 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * This is a simple example client application for the Octopus Farmer game.
- * You're welcome to use this as the basis for your own submission, but there
- * is no requirement to do so.
+ * This is a simple CLI for the Octopus Farmer game.
  */
 
 import { program } from 'commander';
-import open from 'open';
 import { Client } from './client.js';
-import { GameData, OctopusPosition, GameMetadata, NewGameRequest } from '@mdwelsh/octofarm-types';
-
-/**
- * This is a very basic implementation of the octopus, which moves randomly.
- * You'll want to replace this with your own, much better, implementation.
- */
-function dumbOctopus(game: GameData): OctopusPosition {
-	const x = game.world.octopus.x + (Math.random() < 0.5 ? 1 : -1);
-	const y = game.world.octopus.x + (Math.random() < 0.5 ? 1 : -1);
-	return { x, y } as OctopusPosition;
-}
+import { GameMetadata, NewGameRequest } from './types.js';
+import { DumbOctopus } from './octopus.js';
 
 program
 	.name('octofarm')
@@ -34,7 +22,6 @@ program
 	.option('--type <string>', 'Game type', 'normal')
 	.option('--seed <int>', 'Seed for game PRNG')
 	.option('--steps <int>', 'Total number of steps to run', '1000')
-	.option('--view', 'Open a browser window to view the game')
 	.action(async (gameId?: string, opts?) => {
 		const newGameRequest: NewGameRequest = {
 			owner: opts.owner,
@@ -42,10 +29,7 @@ program
 			gameType: opts.type,
 		};
 		const client = await Client.Create(program.opts().url, gameId, newGameRequest);
-		if (program.opts().view) {
-			open(client.previewUrl());
-		}
-		client.run(dumbOctopus, parseInt(opts.steps));
+		client.run(DumbOctopus, parseInt(opts.steps));
 	});
 
 /* The `status` command reads the current state of a given game. */

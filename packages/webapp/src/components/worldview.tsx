@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { WorldData, TentacleData } from '@mdwelsh/octofarm-types';
+import { WorldData, TentacleData } from '@mdwelsh/octofarm';
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;

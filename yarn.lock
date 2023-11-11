@@ -1876,15 +1876,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mdwelsh/octofarm-types@*, @mdwelsh/octofarm-types@workspace:packages/octofarm-types":
+"@mdwelsh/octofarm@*, @mdwelsh/octofarm@workspace:packages/client":
   version: 0.0.0-use.local
-  resolution: "@mdwelsh/octofarm-types@workspace:packages/octofarm-types"
+  resolution: "@mdwelsh/octofarm@workspace:packages/client"
   dependencies:
+    "@types/node": ^18
+    "@types/terminal-kit": ^2.5.1
     "@typescript-eslint/eslint-plugin": ^6.0.0
     "@typescript-eslint/parser": ^6.0.0
+    commander: ^11.0.0
     eslint: ^8.44.0
     prettier: ^3.0.0
+    terminal-kit: ^3.0.0
     typescript: 5.1.3
+  bin:
+    octofarm: ./dist/main.js
   languageName: unknown
   linkType: soft
 
@@ -4037,24 +4043,6 @@ __metadata:
   checksum: 0c16bf660dadb90610553c1d8946a7fdfb81d624adea073b8440b7d795d5b5b08beb3c950c6a2cf16279365a3265158a236876d92bce16423c485c322d7dfaf8
   languageName: node
   linkType: hard
-
-"client@workspace:packages/client":
-  version: 0.0.0-use.local
-  resolution: "client@workspace:packages/client"
-  dependencies:
-    "@mdwelsh/octofarm-types": "*"
-    "@types/node": ^18
-    "@types/terminal-kit": ^2.5.1
-    "@typescript-eslint/eslint-plugin": ^6.0.0
-    "@typescript-eslint/parser": ^6.0.0
-    commander: ^11.0.0
-    eslint: ^8.44.0
-    open: ^9.1.0
-    prettier: ^3.0.0
-    terminal-kit: ^3.0.0
-    typescript: 5.1.3
-  languageName: unknown
-  linkType: soft
 
 "cliui@npm:^8.0.1":
   version: 8.0.1
@@ -10293,7 +10281,7 @@ __metadata:
     "@babel/plugin-transform-react-jsx": ^7.22.5
     "@babel/preset-env": ^7.22.9
     "@jest/globals": ^29.6.1
-    "@mdwelsh/octofarm-types": "*"
+    "@mdwelsh/octofarm": "*"
     "@next/eslint-plugin-next": ^13.4.6
     "@phosphor-icons/react": ^2.0.10
     "@radix-ui/react-alert-dialog": ^1.0.4
