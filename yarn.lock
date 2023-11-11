@@ -1876,6 +1876,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mdwelsh/octofarm-types@*, @mdwelsh/octofarm-types@workspace:packages/octofarm-types":
+  version: 0.0.0-use.local
+  resolution: "@mdwelsh/octofarm-types@workspace:packages/octofarm-types"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": ^6.0.0
+    "@typescript-eslint/parser": ^6.0.0
+    eslint: ^8.44.0
+    prettier: ^3.0.0
+    typescript: 5.1.3
+  languageName: unknown
+  linkType: soft
+
 "@next/env@npm:13.5.6":
   version: 13.5.6
   resolution: "@next/env@npm:13.5.6"
@@ -4030,13 +4042,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "client@workspace:packages/client"
   dependencies:
+    "@mdwelsh/octofarm-types": "*"
     "@types/node": ^18
     "@types/terminal-kit": ^2.5.1
     "@typescript-eslint/eslint-plugin": ^6.0.0
     "@typescript-eslint/parser": ^6.0.0
     commander: ^11.0.0
     eslint: ^8.44.0
-    octofarm-types: "*"
     open: ^9.1.0
     prettier: ^3.0.0
     terminal-kit: ^3.0.0
@@ -8015,18 +8027,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"octofarm-types@*, octofarm-types@workspace:packages/octofarm-types":
-  version: 0.0.0-use.local
-  resolution: "octofarm-types@workspace:packages/octofarm-types"
-  dependencies:
-    "@typescript-eslint/eslint-plugin": ^6.0.0
-    "@typescript-eslint/parser": ^6.0.0
-    eslint: ^8.44.0
-    prettier: ^3.0.0
-    typescript: 5.1.3
-  languageName: unknown
-  linkType: soft
-
 "octopusfarmer-monorepo-root@workspace:.":
   version: 0.0.0-use.local
   resolution: "octopusfarmer-monorepo-root@workspace:."
@@ -10293,6 +10293,7 @@ __metadata:
     "@babel/plugin-transform-react-jsx": ^7.22.5
     "@babel/preset-env": ^7.22.9
     "@jest/globals": ^29.6.1
+    "@mdwelsh/octofarm-types": "*"
     "@next/eslint-plugin-next": ^13.4.6
     "@phosphor-icons/react": ^2.0.10
     "@radix-ui/react-alert-dialog": ^1.0.4
@@ -10317,7 +10318,6 @@ __metadata:
     lucide-react: ^0.256.0
     nanoid: ^4.0.2
     next: ^13.4.19
-    octofarm-types: "*"
     postcss: 8.4.24
     postcss-cli: ^10.1.0
     react: 18.2.0

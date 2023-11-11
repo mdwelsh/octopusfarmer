@@ -9,7 +9,7 @@
 import { program } from 'commander';
 import open from 'open';
 import { Client } from './client.js';
-import { GameData, OctopusPosition, GameMetadata, NewGameRequest } from 'octofarm-types';
+import { GameData, OctopusPosition, GameMetadata, NewGameRequest } from '@mdwelsh/octofarm-types';
 
 /**
  * This is a very basic implementation of the octopus, which moves randomly.

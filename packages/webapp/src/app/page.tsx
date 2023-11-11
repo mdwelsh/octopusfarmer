@@ -2,7 +2,7 @@
 
 'use client';
 import styles from './page.module.css';
-import { GameMetadata } from 'octofarm-types';
+import { GameMetadata } from '@mdwelsh/octofarm-types';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 // @ts-expect-error

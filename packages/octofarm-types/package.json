@@ -1,5 +1,5 @@
 {
-	"name": "octofarm-types",
+	"name": "@mdwelsh/octofarm-types",
 	"version": "0.1.0",
 	"type": "module",
 	"main": "src/types.ts",
