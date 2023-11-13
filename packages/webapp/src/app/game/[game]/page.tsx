@@ -13,21 +13,26 @@ type RouteSegment = { params: { game: string } };
 
 export default function GameDetail({ params }: RouteSegment) {
 	const [game, setGame] = useState<null | GameData>(null);
-
-	const fetchGame = async () => {
-		const res = await fetch(`/api/game/${params.game}`, {
-			method: 'GET',
-		});
-		if (!res.ok) {
-			return;
-		}
-		const data = await res.json();
-		setGame(data);
-	};
+	const [timer, setTimer] = useState(0);
 
 	useEffect(() => {
+		const intervalId = setInterval(() => {
+			setTimer((prevTimer: number) => prevTimer + 1); // Increment the timer
+		}, 200);
+
+		const fetchGame = async () => {
+			const res = await fetch(`/api/game/${params.game}`, {
+				method: 'GET',
+			});
+			if (!res.ok) {
+				return;
+			}
+			const data = await res.json();
+			setGame(data);
+		};
 		fetchGame();
-	});
+		return () => clearInterval(intervalId); 
+	}, [timer, params.game]);
 
 	return (
 		game && (
@@ -38,6 +43,7 @@ export default function GameDetail({ params }: RouteSegment) {
 					<div className="font-mono font-sm pt-6">Hash: {stringHash(params.game).toString(16)}</div>
 					<div className="font-mono font-sm pt-6">Moves: {game!.world.moves}</div>
 					<div className="font-mono font-sm">Score: {game!.world.score}</div>
+					<div className="font-mono font-sm">Octopus is {game!.world.octopus.alive ? 'alive' : 'dead'}</div>
 					<div className="pt-6">
 						<DeleteGameDialog gameId={game.gameId}>
 							<Button className="rounded-full border-2 border-red-700 bg-black text-white hover:bg-slate-600">

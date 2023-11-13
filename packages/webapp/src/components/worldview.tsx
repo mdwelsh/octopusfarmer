@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 
 import { WorldData, TentacleData } from '@mdwelsh/octofarm';
 
-const CANVAS_WIDTH = 600;
-const CANVAS_HEIGHT = 600;
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 800;
 const SHOW_GRID = false;
 
 function drawWorld(ctx: CanvasRenderingContext2D, world?: WorldData) {
@@ -31,18 +31,33 @@ function drawWorld(ctx: CanvasRenderingContext2D, world?: WorldData) {
 			ctx.stroke();
 		}
 	}
+	// Draw traps first.
+	if ('traps' in world) {
+		for (const trap of world.traps) {
+			ctx.beginPath();
+			ctx.arc(trap.x * tileWidth, trap.y * tileHeight, trap.radius * tileWidth, 0, 2 * Math.PI, false);
+			ctx.fillStyle = '#602020';
+			ctx.fill();
+		}
+	}
 	// Draw the octopus.
+	ctx.font = '10px sans-serif';
 	ctx.fillStyle = '#5050ff';
-	ctx.fillRect(world.octopus.x * tileWidth, world.octopus.y * tileHeight, tileWidth, tileHeight);
+	ctx.fillText('🐙', world.octopus.x * tileWidth, world.octopus.y * tileHeight);
+	if (!world.octopus.alive) {
+		ctx.fillText('❌', world.octopus.x * tileWidth, world.octopus.y * tileHeight);
+	}
 	// Draw all fish.
 	for (const fish of world.fish) {
 		// If the fish is in the octopus.tentacles, draw it red.
 		if (world.octopus.tentacles.some((tentacle: TentacleData) => tentacle && tentacle.fishId === fish.id)) {
-			ctx.fillStyle = '#ff5050';
+			ctx.fillText('🎣', fish.x * tileWidth, fish.y * tileHeight);
 		} else {
-			ctx.fillStyle = '#50ff50';
+			const fishGlyphs = [ '🐟', '🐠', '🦈', '🐡', '🐋', '🐳', '🦐', '🐬', '🦞' ]
+			// Pick the glyph based on fish.value.
+			const glyph = fishGlyphs[fish.value % fishGlyphs.length];
+			ctx.fillText(glyph, fish.x * tileWidth, fish.y * tileHeight);
 		}
-		ctx.fillRect(fish.x * tileWidth, fish.y * tileHeight, tileWidth, tileHeight);
 	}
 }
 

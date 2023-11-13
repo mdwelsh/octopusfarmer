@@ -11,7 +11,8 @@ export type NewGameRequest = {
 
 	/**
 	 * The game type to create. If unspecified, defaults to "normal".
-	 * 	 "test": A small, easy test game.
+	 * 	 "test": A test game with one fish group and one trap.
+	 *   "easy": A game without any traps.
 	 * 	 "normal": A normal difficulty game.
 	 * 	 "hard": A hard difficulty game.
 	 * 	 "insane": An insanely difficult game.
@@ -70,6 +71,8 @@ export type WorldData = {
 	octopus: OctopusData;
 	/** The fish that the octopus is trying to capture. */
 	fish: FishData[];
+	/** The traps that the octopus should avoid. */
+	traps: TrapData[];
 };
 
 /** Represents the state of the octopus. */
@@ -86,6 +89,8 @@ export type OctopusData = {
 	attack: number;
 	/** The state of each tentacle. */
 	tentacles: TentacleData[];
+	/** Whether the Octopus is alive. */
+	alive: boolean;
 };
 
 /** Represents a single tentacle of the octopus. */
@@ -109,6 +114,16 @@ export type FishData = {
 	value: number;
 	/** The current health of the fish. */
 	health: number;
+};
+
+/** Represents a trap. If the octopus comes within `radius` units of the trap, it will die. */
+export type TrapData = {
+	/** The x position of the trap. */
+	x: number;
+	/** The y position of the trap. */
+	y: number;
+	/** The reach of the trap. */
+	radius: number;
 };
 
 /** Represents a move that the octopus can make. */
