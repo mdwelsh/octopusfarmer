@@ -13,6 +13,7 @@ build-backend = "poetry.masonry.api"
 python = "~3.9"
 dataclasses-json = "0.5.14"
 requests = "^2.31.0"
+rich = "^13.6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"

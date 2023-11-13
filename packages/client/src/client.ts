@@ -121,7 +121,7 @@ export class Client {
 	}
 
 	/**
-	 * Run a single step of thge game.
+	 * Run a single step of the game.
 	 * @param octopus The function to call to move the octopus.
 	 * @returns The updated game state.
 	 */
