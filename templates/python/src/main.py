@@ -11,7 +11,7 @@ YOUR_EMAIL = 'me@somewhere.com'
 # If you want a repeatable game state for debugging, you can change this to a number.
 SEED: Optional[int] = None
 # You are welcome to change this to one of the
-# game types: 'test', 'normal', 'hard', or 'insane'.
+# game types: 'test', 'easy', 'normal', 'hard', or 'insane'.
 GAME_TYPE = "normal"
 # Don't edit this unless you are debugging against
 # a test server (not something we expect you to do).

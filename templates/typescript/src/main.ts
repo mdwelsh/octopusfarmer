@@ -14,7 +14,7 @@ const YOUR_EMAIL = 'me@somewhere.com';
 // you can change this to a number.
 const SEED = undefined;
 // You are welcome to change this to one of the
-// game types: 'test', 'normal', 'hard', or 'insane'.
+// game types: 'test', 'easy', 'normal', 'hard', or 'insane'.
 const GAME_TYPE: GameType = 'normal';
 // Don't edit this unless you are debugging against
 // a test server (not something we expect you to do).

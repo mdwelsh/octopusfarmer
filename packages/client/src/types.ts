@@ -2,7 +2,7 @@
  * This file contains type definitions for the Octopus Farmer game state.
  */
 
-export type GameType = 'test' | 'normal' | 'hard' | 'insane';
+export type GameType = 'test' | 'easy' | 'normal' | 'hard' | 'insane';
 
 /** A request to create a new game. */
 export type NewGameRequest = {

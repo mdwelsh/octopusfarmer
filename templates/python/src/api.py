@@ -22,7 +22,7 @@ class NewGameRequest(CamelCaseJsonMixin):
     """A request to create a new game."""
 
     owner: str
-    # Must be "test", "normal", "hard", or "insane".
+    # Must be "test", "easy", "normal", "hard", or "insane".
     game_type: Optional[str] = None
     seed: Optional[int] = None
 
