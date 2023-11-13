@@ -62,6 +62,16 @@ class OctopusData(CamelCaseJsonMixin):
 
 @dataclasses_json.dataclass_json
 @dataclasses.dataclass
+class TrapData(CamelCaseJsonMixin):
+    """Represents a single trap."""
+
+    x: int
+    y: int
+    radius: int
+
+
+@dataclasses_json.dataclass_json
+@dataclasses.dataclass
 class WorldData(CamelCaseJsonMixin):
     """The overall world state."""
 
@@ -71,6 +81,7 @@ class WorldData(CamelCaseJsonMixin):
     score: int
     octopus: OctopusData
     fish: List[FishData]
+    traps: Optional[List[TrapData]] = None
 
 
 @dataclasses_json.dataclass_json
