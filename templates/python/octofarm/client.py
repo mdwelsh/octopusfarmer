@@ -60,7 +60,6 @@ class Client:
     def _new_game(self, req: api.NewGameRequest) -> api.GameData:
         """Start a new game."""
         import json
-        print(f"REQ IS: {json.dumps(req.to_dict())}")
         resp = requests.post(f"{self._url}/api/games", json=req.to_dict())
         resp.raise_for_status()
         return api.GameData.from_dict(resp.json())

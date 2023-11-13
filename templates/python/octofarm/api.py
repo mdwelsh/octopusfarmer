@@ -18,22 +18,12 @@ class CamelCaseJsonMixin(dataclasses_json.DataClassJsonMixin):
 
 @dataclasses_json.dataclass_json
 @dataclasses.dataclass
-class GameType(enum.Enum):
-    """Represents the game difficulty."""
-
-    TEST = "test"
-    NORMAL = "normal"
-    HARD = "hard"
-    INSANE = "insane"
-
-
-@dataclasses_json.dataclass_json
-@dataclasses.dataclass
 class NewGameRequest(CamelCaseJsonMixin):
     """A request to create a new game."""
 
     owner: str
-    game_type: Optional[GameType] = None
+    # Must be "test", "normal", "hard", or "insane".
+    game_type: Optional[str] = None
     seed: Optional[int] = None
 
 

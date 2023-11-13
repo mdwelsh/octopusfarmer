@@ -12,7 +12,7 @@ YOUR_EMAIL = 'me@somewhere.com'
 SEED: Optional[int] = None
 # You are welcome to change this to one of the
 # game types: 'test', 'normal', 'hard', or 'insane'.
-GAME_TYPE: octofarm.api.GameType = octofarm.api.GameType.NORMAL
+GAME_TYPE = "normal"
 # Don't edit this unless you are debugging against
 # a test server (not something we expect you to do).
 SERVER_URL = "https://octopusfarmer.com"
