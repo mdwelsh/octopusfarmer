@@ -5,7 +5,8 @@ import requests
 from rich.console import Console
 from rich.progress import track
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
-from octofarm import api
+
+import api
 
 console = Console()
 

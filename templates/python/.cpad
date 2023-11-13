@@ -1,0 +1,8 @@
+{
+  "targets": {
+    "run": {
+      "label": "Main",
+      "command": "python src/main.py"
+    }
+  }
+}

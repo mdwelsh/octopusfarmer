@@ -3,8 +3,8 @@
 import random
 from typing import Optional
 
-import octofarm.api
-import octofarm.client
+import api
+import client
 
 # Please edit the following with your email address.
 YOUR_EMAIL = 'me@somewhere.com'
@@ -20,15 +20,14 @@ SERVER_URL = "https://octopusfarmer.com"
 GAME_STEPS = 1000
 
 # Your job is to replace the code below with a much better implementation.
-def my_octopus(game: octofarm.api.GameData) -> octofarm.client.OctopusPosition:
+def my_octopus(game: api.GameData) -> client.OctopusPosition:
     x = game.world.octopus.x + random.choice([-1, 1])
     y = game.world.octopus.y + random.choice([-1, 1])
-    return octofarm.client.OctopusPosition(x=x, y=y)
+    return client.OctopusPosition(x=x, y=y)
 
 
 # You shouldn't need to edit anything below this line.
-#new_game_request = octofarm.api.NewGameRequest(owner=YOUR_EMAIL, game_type=GAME_TYPE, seed=SEED)
-new_game_request = octofarm.api.NewGameRequest(owner=YOUR_EMAIL, game_type=GAME_TYPE)
-client = octofarm.client.Client(SERVER_URL, new_game=new_game_request)
-client.run(my_octopus, 100)
+new_game_request = api.NewGameRequest(owner=YOUR_EMAIL, game_type=GAME_TYPE, seed=SEED)
+c = client.Client(SERVER_URL, new_game=new_game_request)
+c.run(my_octopus, 100)
 
